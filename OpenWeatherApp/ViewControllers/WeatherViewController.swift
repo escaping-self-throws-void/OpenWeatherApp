@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  WeatherViewController.swift
 //  OpenWeatherApp
 //
 //  Created by Paul Matar on 16/06/2022.
@@ -8,19 +8,19 @@
 import UIKit
 import CoreLocation
 
-class ViewController: UIViewController {
+class WeatherViewController: UIViewController {
 
-    @IBOutlet weak var forecastTableView: UITableView!
+    @IBOutlet weak var weatherTableView: UITableView!
     @IBOutlet weak var searchTextField: UITextField!
     
     private let locationManager = CLLocationManager()
-    private let ws = WeatherService()
+    private let ws = WeatherViewModel()
     private var city: City?
     private var switcher = true
     
     private var weatherList: [List] = [] {
         didSet {
-            forecastTableView.reloadData()
+            weatherTableView.reloadData()
             searchTextField.text = ""
         }
     }
@@ -28,7 +28,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         addGesture()
-        forecastTableView.allowsSelection = false
+        weatherTableView.keyboardDismissMode = .onDrag
+        weatherTableView.allowsSelection = false
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
     }
@@ -41,17 +42,17 @@ class ViewController: UIViewController {
 
 // MARK: - UITableView methods
 
-extension ViewController: UITableViewDelegate, UITableViewDataSource {
+extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         weatherList.count
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switcher ? city?.name : "Selected cities"
+        switcher ? city?.name : ws.createDateTime(unix: weatherList.first?.dt)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ForecastCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: K.cellID, for: indexPath)
         let list = weatherList[indexPath.row]
         
         var content = cell.defaultContentConfiguration()
@@ -65,7 +66,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 
 // MARK: - UITextField Delegate methods
 
-extension ViewController: UITextFieldDelegate {
+extension WeatherViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         searchPressed()
         searchTextField.resignFirstResponder()
@@ -75,7 +76,7 @@ extension ViewController: UITextFieldDelegate {
 
 // MARK: - CLLocationManager Delegate methods
 
-extension ViewController: CLLocationManagerDelegate {
+extension WeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             locationManager.stopUpdatingLocation()
@@ -103,7 +104,7 @@ extension ViewController: CLLocationManagerDelegate {
 
 // MARK: - Private methods
 
-extension ViewController {
+extension WeatherViewController {
     
     private func searchPressed() {
         Task {

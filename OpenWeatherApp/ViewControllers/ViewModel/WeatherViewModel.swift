@@ -1,5 +1,5 @@
 //
-//  WeatherService.swift
+//  WeatherViewModel.swift
 //  OpenWeatherApp
 //
 //  Created by Paul Matar on 16/06/2022.
@@ -8,7 +8,7 @@
 import CoreLocation
 
 
-struct WeatherService: NetworkService {
+struct WeatherViewModel: NetworkService {
     func fetchWeather(for cities: String) async throws -> [List] {
         let filteredCities = cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
         var lists: [List] = []
@@ -27,8 +27,9 @@ struct WeatherService: NetworkService {
         return try await fetch(with: stringUrl)
     }
     
-    func createDateTime(unix: Double) -> String {
+    func createDateTime(unix: Double?) -> String {
         var strDate = "undefined"
+        guard let unix = unix else { return strDate }
         
         let date = Date(timeIntervalSince1970: unix)
         let dateFormatter = DateFormatter()
