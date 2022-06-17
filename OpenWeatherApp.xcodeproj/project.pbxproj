@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CF650210285CEF06008BAFE1 /* WeatherModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF65020F285CEF06008BAFE1 /* WeatherModel.swift */; };
 		CFDF66B5285B9B1A001B9A22 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDF66B4285B9B1A001B9A22 /* Constants.swift */; };
-		CFDF66B7285B9F0B001B9A22 /* WeatherModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDF66B6285B9F0B001B9A22 /* WeatherModel.swift */; };
 		CFDF66BA285BA38B001B9A22 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDF66B9285BA38B001B9A22 /* WeatherService.swift */; };
+		CFDF66BF285CC8AC001B9A22 /* ForecastModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDF66BE285CC8AC001B9A22 /* ForecastModel.swift */; };
 		CFFCD6DC285B126100F4B73F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCD6DB285B126100F4B73F /* AppDelegate.swift */; };
 		CFFCD6DE285B126100F4B73F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCD6DD285B126100F4B73F /* SceneDelegate.swift */; };
 		CFFCD6E0285B126100F4B73F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCD6DF285B126100F4B73F /* ViewController.swift */; };
@@ -33,9 +34,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CF65020F285CEF06008BAFE1 /* WeatherModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherModel.swift; sourceTree = "<group>"; };
 		CFDF66B4285B9B1A001B9A22 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		CFDF66B6285B9F0B001B9A22 /* WeatherModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherModel.swift; sourceTree = "<group>"; };
 		CFDF66B9285BA38B001B9A22 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		CFDF66BE285CC8AC001B9A22 /* ForecastModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastModel.swift; sourceTree = "<group>"; };
 		CFFCD6D8285B126100F4B73F /* OpenWeatherApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenWeatherApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFFCD6DB285B126100F4B73F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CFFCD6DD285B126100F4B73F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -72,9 +74,18 @@
 		CFDF66B8285BA326001B9A22 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				CFDF66B6285B9F0B001B9A22 /* WeatherModel.swift */,
+				CFDF66BE285CC8AC001B9A22 /* ForecastModel.swift */,
+				CF65020F285CEF06008BAFE1 /* WeatherModel.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		CFDF66BB285CAFC6001B9A22 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				CFDF66B9285BA38B001B9A22 /* WeatherService.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		CFFCD6CF285B126000F4B73F = {
@@ -120,6 +131,7 @@
 		CFFCD70B285B12A900F4B73F /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				CFDF66BB285CAFC6001B9A22 /* ViewModel */,
 				CFFCD6DF285B126100F4B73F /* ViewController.swift */,
 			);
 			path = ViewControllers;
@@ -158,7 +170,6 @@
 			children = (
 				CFFCD711285B2A4400F4B73F /* NetworkService.swift */,
 				CFFCD714285B2A7200F4B73F /* NError.swift */,
-				CFDF66B9285BA38B001B9A22 /* WeatherService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -269,7 +280,8 @@
 				CFFCD715285B2A7200F4B73F /* NError.swift in Sources */,
 				CFFCD6E0285B126100F4B73F /* ViewController.swift in Sources */,
 				CFFCD6DC285B126100F4B73F /* AppDelegate.swift in Sources */,
-				CFDF66B7285B9F0B001B9A22 /* WeatherModel.swift in Sources */,
+				CF650210285CEF06008BAFE1 /* WeatherModel.swift in Sources */,
+				CFDF66BF285CC8AC001B9A22 /* ForecastModel.swift in Sources */,
 				CFFCD712285B2A4400F4B73F /* NetworkService.swift in Sources */,
 				CFFCD6DE285B126100F4B73F /* SceneDelegate.swift in Sources */,
 				CFDF66B5285B9B1A001B9A22 /* Constants.swift in Sources */,

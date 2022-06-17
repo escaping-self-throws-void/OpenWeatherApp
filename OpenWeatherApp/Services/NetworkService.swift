@@ -23,7 +23,10 @@ extension NetworkService {
             throw NError.invalidResponse
         }
         
-        guard let decodedResponse = try? JSONDecoder().decode(T.self, from: data) else {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        guard let decodedResponse = try? decoder.decode(T.self, from: data) else {
             throw NError.unableToDecode
         }
         

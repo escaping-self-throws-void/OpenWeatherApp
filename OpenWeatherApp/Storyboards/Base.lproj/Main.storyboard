@@ -16,24 +16,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="VKu-0O-M1X">
-                                <rect key="frame" x="0.0" y="279" width="320" height="289"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="CityCell" id="mlz-Hi-6EA">
-                                        <rect key="frame" x="0.0" y="44.5" width="320" height="43.5"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="mlz-Hi-6EA" id="pL7-lV-MQV">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </prototypes>
-                                <connections>
-                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="Yck-xq-8oQ"/>
-                                    <outlet property="delegate" destination="BYZ-38-t0r" id="Tcb-q8-pux"/>
-                                </connections>
-                            </tableView>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="9hQ-WH-85q">
                                 <rect key="frame" x="15" y="5" width="290" height="40"/>
                                 <subviews>
@@ -46,16 +28,22 @@
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="location" catalog="system"/>
                                         <buttonConfiguration key="configuration" style="plain" image="location" catalog="system"/>
+                                        <connections>
+                                            <action selector="geoButtonPressed" destination="BYZ-38-t0r" eventType="touchUpInside" id="JTV-Kw-lhg"/>
+                                        </connections>
                                     </button>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OsE-DJ-vHK">
                                         <rect key="frame" x="45" y="0.0" width="245" height="40"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits"/>
+                                        <textInputTraits key="textInputTraits" returnKeyType="search" enablesReturnKeyAutomatically="YES"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="BYZ-38-t0r" id="O4e-pq-jcA"/>
+                                        </connections>
                                     </textField>
                                 </subviews>
                             </stackView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="Zyt-qg-W9g">
-                                <rect key="frame" x="0.0" y="47" width="320" height="227"/>
+                                <rect key="frame" x="0.0" y="50" width="320" height="518"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ForecastCell" id="fRH-ra-UIU">
@@ -76,22 +64,18 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="VKu-0O-M1X" secondAttribute="bottom" id="4EF-LN-d1n"/>
-                            <constraint firstItem="VKu-0O-M1X" firstAttribute="top" secondItem="Zyt-qg-W9g" secondAttribute="bottom" constant="5" id="67I-5e-gEv"/>
                             <constraint firstItem="9hQ-WH-85q" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="5" id="Kgv-NZ-Gky"/>
-                            <constraint firstItem="VKu-0O-M1X" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="UMw-54-hga"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="Zyt-qg-W9g" secondAttribute="bottom" id="T6i-j3-8tS"/>
                             <constraint firstItem="9hQ-WH-85q" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="15" id="VaP-kZ-2Oo"/>
                             <constraint firstItem="Zyt-qg-W9g" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Vgd-l8-4Dt"/>
-                            <constraint firstItem="Zyt-qg-W9g" firstAttribute="top" secondItem="9hQ-WH-85q" secondAttribute="bottom" constant="2" id="ZD9-hY-ANw"/>
+                            <constraint firstItem="Zyt-qg-W9g" firstAttribute="top" secondItem="9hQ-WH-85q" secondAttribute="bottom" constant="5" id="ZD9-hY-ANw"/>
                             <constraint firstItem="Zyt-qg-W9g" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="Zuh-Av-8Wu"/>
-                            <constraint firstItem="Zyt-qg-W9g" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" multiplier="0.4" id="fpR-DX-wEQ"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="VKu-0O-M1X" secondAttribute="trailing" id="gAK-fa-Ce1"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="9hQ-WH-85q" secondAttribute="trailing" constant="15" id="ze7-qi-vcZ"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="citiesTableView" destination="VKu-0O-M1X" id="51A-n9-f22"/>
                         <outlet property="forecastTableView" destination="Zyt-qg-W9g" id="iK2-fd-LJm"/>
+                        <outlet property="searchTextField" destination="OsE-DJ-vHK" id="3kM-KQ-8Et"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
