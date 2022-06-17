@@ -1,5 +1,5 @@
 //
-//  ForecastModel.swift
+//  WeatherData.swift
 //  OpenWeatherApp
 //
 //  Created by Paul Matar on 17/06/2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ForecastModel: Codable {
+struct WeatherData: Codable {
     let list: [List]
     let city: City
 }

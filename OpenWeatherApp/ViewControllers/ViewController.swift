@@ -15,8 +15,8 @@ class ViewController: UIViewController {
     
     private let locationManager = CLLocationManager()
     private let ws = WeatherService()
-    
     private var city: City?
+    private var switcher = true
     
     private var weatherList: [List] = [] {
         didSet {
@@ -24,8 +24,6 @@ class ViewController: UIViewController {
             searchTextField.text = ""
         }
     }
-    
-    private var switcher = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,31 +51,16 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: "ForecastCell", for: indexPath)
+        let list = weatherList[indexPath.row]
         
-        switch switcher {
-        case true:
-            let list = weatherList[indexPath.row]
+        var content = cell.defaultContentConfiguration()
+        content.text = switcher ? ws.createDateTime(unix: list.dt) : list.name
+        content.secondaryText = "\(list.main.tempMin) - \(list.main.tempMax) C " + (list.weather.first?.description ?? "undefined") + " windspeed: \(list.wind.speed)"
+        cell.contentConfiguration = content
         
-            var content = cell.defaultContentConfiguration()
-            content.text = ws.createDateTime(unix: list.dt)
-            content.secondaryText = "\(list.main.tempMin) - \(list.main.tempMax) C " + (list.weather.first?.description ?? "undefined") + " windspeed: \(list.wind.speed)"
-            
-            cell.contentConfiguration = content
-        default:
-            let list = weatherList[indexPath.row]
-            
-            var content = cell.defaultContentConfiguration()
-            content.text = list.name
-            content.secondaryText = "\(list.main.tempMin) - \(list.main.tempMax) C " + (list.weather.first?.description ?? "undefined") + " windspeed: \(list.wind.speed)"
-            
-            cell.contentConfiguration = content
-        }
         return cell
-        
     }
-    
 }
 
 // MARK: - UITextField Delegate methods
@@ -127,7 +110,7 @@ extension ViewController {
             do {
                 let list = try await ws.fetchWeather(for: searchTextField.text!)
                 await MainActor.run {
-                    weatherList = [list]
+                    weatherList = list
                 }
             } catch {
                 print(error)

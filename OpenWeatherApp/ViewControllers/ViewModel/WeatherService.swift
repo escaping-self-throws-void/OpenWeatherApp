@@ -9,13 +9,20 @@ import CoreLocation
 
 
 struct WeatherService: NetworkService {
-    func fetchWeather(for city: String) async throws -> List {
-        let stringUrl = K.baseURL + K.apiKey + "&q=\(city)"
-        print(stringUrl)
-        return try await fetch(with: stringUrl)
+    func fetchWeather(for cities: String) async throws -> [List] {
+        let filteredCities = cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
+        var lists: [List] = []
+        
+        for i in filteredCities {
+            let stringUrl = K.baseURL + K.apiKey + "&q=\(i)"
+            async let list: List = fetch(with: stringUrl)
+            lists += [try await list]
+        }
+        
+        return lists
     }
     
-    func fetchWeather(lat: CLLocationDegrees, lon: CLLocationDegrees) async throws -> ForecastModel {
+    func fetchWeather(lat: CLLocationDegrees, lon: CLLocationDegrees) async throws -> WeatherData {
         let stringUrl = K.forecastURL + K.apiKey + "&lat=\(lat)&lon=\(lon)"
         return try await fetch(with: stringUrl)
     }
