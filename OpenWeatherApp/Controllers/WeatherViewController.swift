@@ -14,21 +14,12 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var searchTextField: UITextField!
     
     private let locationManager = CLLocationManager()
-    private let ws = WeatherViewModel()
-    private var city: City?
-    private var switcher = true
-    
-    private var weatherList: [List] = [] {
-        didSet {
-            weatherTableView.reloadData()
-            searchTextField.text = ""
-        }
-    }
+    private var vm: WeatherViewModel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        addGesture()
-        weatherTableView.keyboardDismissMode = .onDrag
+        vm = WeatherViewModel(service: WeatherService(), closure: updateUI)
+        addKeyboardDismiss()
         weatherTableView.allowsSelection = false
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
@@ -36,7 +27,6 @@ class WeatherViewController: UIViewController {
 
     @IBAction func geoButtonPressed() {
         locationManager.requestLocation()
-        switcher = true
     }
 }
 
@@ -44,20 +34,20 @@ class WeatherViewController: UIViewController {
 
 extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        weatherList.count
+        vm.weatherList.count
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switcher ? city?.name : ws.createDateTime(unix: weatherList.first?.dt)
+        vm.switcher ? vm.city?.name : vm.createDateTime(unix: vm.weatherList.first?.dt)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: K.cellID, for: indexPath)
-        let list = weatherList[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell", for: indexPath)
+        let list = vm.weatherList[indexPath.row]
         
         var content = cell.defaultContentConfiguration()
-        content.text = switcher ? ws.createDateTime(unix: list.dt) : list.name
-        content.secondaryText = "\(list.main.tempMin) - \(list.main.tempMax) C " + (list.weather.first?.description ?? "undefined") + " windspeed: \(list.wind.speed)"
+        content.text = vm.switcher ? vm.createDateTime(unix: list.dt) : list.name
+        content.secondaryText = vm.getDescription(list)
         cell.contentConfiguration = content
         
         return cell
@@ -82,23 +72,27 @@ extension WeatherViewController: CLLocationManagerDelegate {
             locationManager.stopUpdatingLocation()
             let lat = location.coordinate.latitude
             let lon = location.coordinate.longitude
-            Task {
-                do {
-                    let weather = try await ws.fetchWeather(lat: lat, lon: lon)
-                    await MainActor.run {
-                        city = weather.city
-                        weatherList = weather.list
-                    }
-                } catch {
-                    print(error)
+            vm.getGeoWeather(lat: lat, lon: lon) { [weak self] errorText in
+                DispatchQueue.main.async {
+                    self?.showAlert(errorText)
                 }
             }
         }
-        
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print(error)
+        print(error.localizedDescription)
+    }
+}
+
+// MARK: - UIAlertController
+
+extension WeatherViewController {
+    private func showAlert(_ message: String) {
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .cancel)
+        alert.addAction(action)
+        present(alert, animated: true)
     }
 }
 
@@ -107,24 +101,27 @@ extension WeatherViewController: CLLocationManagerDelegate {
 extension WeatherViewController {
     
     private func searchPressed() {
-        Task {
-            do {
-                let list = try await ws.fetchWeather(for: searchTextField.text!)
-                await MainActor.run {
-                    weatherList = list
-                }
-            } catch {
-                print(error)
+        vm.getCitiesForecast(searchTextField.text) { [weak self] errorText in
+            DispatchQueue.main.async {
+                self?.showAlert(errorText)
             }
         }
-        switcher = false
     }
     
-    private func addGesture() {
+    private func updateUI() {
+        DispatchQueue.main.async { [weak self] in
+            self?.weatherTableView.reloadData()
+            self?.searchTextField.text = ""
+        }
+    }
+    
+    private func addKeyboardDismiss() {
         let tapGesture = UITapGestureRecognizer(target: self,
                                                 action: #selector(hideKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
+        
+        weatherTableView.keyboardDismissMode = .onDrag
     }
     
     @objc private func hideKeyboard() {

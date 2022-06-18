@@ -9,28 +9,61 @@ import CoreLocation
 import UIKit
 
 
-final class WeatherViewModel: NetworkService {
+final class WeatherViewModel {
+    private(set) var weatherList: [List] = [] {
+        didSet {
+            closure()
+        }
+    }
+    private(set) var city: City?
+    private(set) var switcher = true
+    private let service: WeatherServicable
+    private var closure: (() -> Void)
     
-    func fetchWeather(for cities: String) async throws -> [List] {
-        let filteredCities = cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
-        if !isValid(filteredCities.count) {
-            fatalError("Wrong number of cities")
+    init(service: WeatherServicable, closure: @escaping () -> Void) {
+        self.service = service
+        self.closure = closure
+    }
+
+    func getGeoWeather(lat: CLLocationDegrees, lon: CLLocationDegrees, failure: @escaping (String) -> Void) {
+        Task {
+            do {
+                let weather = try await service.fetchWeather(lat: lat, lon: lon)
+                city = weather.city
+                weatherList = weather.list
+            } catch {
+                print(error)
+                failure(error.localizedDescription)
+            }
         }
-        var lists: [List] = []
-        
-        for i in filteredCities {
-            let stringUrl = K.baseURL + K.apiKey + "&q=\(i)"
-            async let list: List = fetch(with: stringUrl)
-            lists += [try await list]
-        }
-        
-        return lists
+        switcher = true
     }
     
-    func fetchWeather(lat: CLLocationDegrees, lon: CLLocationDegrees) async throws -> WeatherData {
-        let stringUrl = K.forecastURL + K.apiKey + "&lat=\(lat)&lon=\(lon)"
-        return try await fetch(with: stringUrl)
+    func getCitiesForecast(_ input: String?, failure: @escaping (String) -> Void) {
+        guard let cities = input else { return }
+        let filteredCities = filterCities(cities)
+        
+        guard isValid(filteredCities.count) else {
+            failure("Plese enter minimum 3 and max 7 cities.")
+            return
+        }
+        
+        Task {
+            do {
+                let list = try await service.fetchWeather(for: filteredCities)
+                weatherList = list
+            } catch {
+                print(error)
+                failure(error.localizedDescription)
+            }
+        }
+        switcher = false
     }
+    
+    func getDescription(_ list: List) -> String {
+        "\(list.main.tempMin) - \(list.main.tempMax) C " + (list.weather.first?.description ?? "undefined") + " windspeed: \(list.wind.speed)"
+    }
+    
     
     func createDateTime(unix: Double?) -> String {
         var strDate = "undefined"
@@ -52,5 +85,8 @@ final class WeatherViewModel: NetworkService {
         (3...7).contains(num) ? true : false
     }
     
-
+    private func filterCities(_ cities: String) -> [String] {
+        cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
+    }
+    
 }

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		CF650214285DBC30008BAFE1 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF650213285DBC30008BAFE1 /* WeatherService.swift */; };
-		CFDF66B5285B9B1A001B9A22 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDF66B4285B9B1A001B9A22 /* Constants.swift */; };
 		CFDF66BA285BA38B001B9A22 /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDF66B9285BA38B001B9A22 /* WeatherViewModel.swift */; };
 		CFDF66BF285CC8AC001B9A22 /* WeatherData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDF66BE285CC8AC001B9A22 /* WeatherData.swift */; };
 		CFFCD6DC285B126100F4B73F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCD6DB285B126100F4B73F /* AppDelegate.swift */; };
@@ -19,7 +18,6 @@
 		CFFCD6E8285B126200F4B73F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CFFCD6E6285B126200F4B73F /* LaunchScreen.storyboard */; };
 		CFFCD6F3285B126200F4B73F /* OpenWeatherAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCD6F2285B126200F4B73F /* OpenWeatherAppTests.swift */; };
 		CFFCD712285B2A4400F4B73F /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCD711285B2A4400F4B73F /* NetworkService.swift */; };
-		CFFCD715285B2A7200F4B73F /* NError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCD714285B2A7200F4B73F /* NError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,7 +32,6 @@
 
 /* Begin PBXFileReference section */
 		CF650213285DBC30008BAFE1 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
-		CFDF66B4285B9B1A001B9A22 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		CFDF66B9285BA38B001B9A22 /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		CFDF66BE285CC8AC001B9A22 /* WeatherData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherData.swift; sourceTree = "<group>"; };
 		CFFCD6D8285B126100F4B73F /* OpenWeatherApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenWeatherApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -48,7 +45,6 @@
 		CFFCD6EE285B126200F4B73F /* OpenWeatherAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OpenWeatherAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFFCD6F2285B126200F4B73F /* OpenWeatherAppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenWeatherAppTests.swift; sourceTree = "<group>"; };
 		CFFCD711285B2A4400F4B73F /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
-		CFFCD714285B2A7200F4B73F /* NError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,8 +161,6 @@
 			children = (
 				CFFCD711285B2A4400F4B73F /* NetworkService.swift */,
 				CF650213285DBC30008BAFE1 /* WeatherService.swift */,
-				CFFCD714285B2A7200F4B73F /* NError.swift */,
-				CFDF66B4285B9B1A001B9A22 /* Constants.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -274,13 +268,11 @@
 			files = (
 				CFDF66BA285BA38B001B9A22 /* WeatherViewModel.swift in Sources */,
 				CF650214285DBC30008BAFE1 /* WeatherService.swift in Sources */,
-				CFFCD715285B2A7200F4B73F /* NError.swift in Sources */,
 				CFFCD6E0285B126100F4B73F /* WeatherViewController.swift in Sources */,
 				CFFCD6DC285B126100F4B73F /* AppDelegate.swift in Sources */,
 				CFDF66BF285CC8AC001B9A22 /* WeatherData.swift in Sources */,
 				CFFCD712285B2A4400F4B73F /* NetworkService.swift in Sources */,
 				CFFCD6DE285B126100F4B73F /* SceneDelegate.swift in Sources */,
-				CFDF66B5285B9B1A001B9A22 /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
