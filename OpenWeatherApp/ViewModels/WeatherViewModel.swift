@@ -6,11 +6,16 @@
 //
 
 import CoreLocation
+import UIKit
 
 
-struct WeatherViewModel: NetworkService {
+final class WeatherViewModel: NetworkService {
+    
     func fetchWeather(for cities: String) async throws -> [List] {
         let filteredCities = cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
+        if !isValid(filteredCities.count) {
+            fatalError("Wrong number of cities")
+        }
         var lists: [List] = []
         
         for i in filteredCities {
@@ -42,4 +47,10 @@ struct WeatherViewModel: NetworkService {
         
         return strDate
     }
+    
+    private func isValid(_ num: Int) -> Bool {
+        (3...7).contains(num) ? true : false
+    }
+    
+
 }
