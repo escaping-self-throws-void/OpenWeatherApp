@@ -33,6 +33,7 @@ struct Temp: Codable {
 
 struct Weather: Codable {
     let description: String
+    let id: Int
 }
 
 struct Wind: Codable {

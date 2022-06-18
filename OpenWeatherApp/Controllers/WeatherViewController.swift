@@ -45,6 +45,7 @@ extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
         var content = cell.defaultContentConfiguration()
         content.text = vm.switcher ? vm.createDateTime(unix: list.dt) : list.name
         content.secondaryText = vm.getDescription(list)
+        content.image = UIImage(systemName: vm.getImage(list))
         cell.contentConfiguration = content
         
         return cell

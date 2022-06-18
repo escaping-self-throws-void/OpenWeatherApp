@@ -6,8 +6,6 @@
 //
 
 import CoreLocation
-import UIKit
-
 
 final class WeatherViewModel {
     private(set) var weatherList: [List] = [] {
@@ -90,10 +88,32 @@ extension WeatherViewModel {
         let maxT = String(format: "%1.f", list.main.tempMax)
         let info = list.weather.first?.description ?? "undefined"
         let wSpeed = list.wind.speed
-        let description = "\(minT) - \(maxT) °C  \(info) windspeed: \(wSpeed)"
+        let description = "\(minT) - \(maxT) °C  \(info.capitalized) windspeed: \(wSpeed) m/s"
         return description
     }
     
+    func getImage(_ list: List) -> String {
+        let code = list.weather.first?.id ?? 0
+        
+        switch code {
+        case 200...232:
+            return "cloud.bolt"
+        case 300...321:
+            return "cloud.drizzle"
+        case 500...531:
+            return "cloud.rain"
+        case 600...622:
+            return "cloud.snow"
+        case 701...781:
+            return "cloud.fog"
+        case 800:
+            return "sun.max"
+        case 801...804:
+            return "cloud.bolt"
+        default:
+            return "cloud"
+        }
+    }
     
     func createDateTime(unix: Double?) -> String {
         var strDate = "undefined"
