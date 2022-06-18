@@ -7,7 +7,7 @@
 
 import CoreLocation
 
-final class WeatherViewModel {
+final class WeatherViewModel: WeatherService {
     private(set) var weatherList: [List] = [] {
         didSet {
             closure()
@@ -17,11 +17,9 @@ final class WeatherViewModel {
     private(set) var switcher = true
     private let locationManager = CLLocationManager()
     
-    private let service: WeatherServicable
     private var closure: (() -> Void)
     
-    init(service: WeatherServicable, locDelegate: CLLocationManagerDelegate, closure: @escaping () -> Void) {
-        self.service = service
+    init(locDelegate: CLLocationManagerDelegate, closure: @escaping () -> Void) {
         self.closure = closure
         locationManager.delegate = locDelegate
         locationManager.requestWhenInUseAuthorization()
@@ -37,13 +35,13 @@ extension WeatherViewModel {
             return
         }
         
-        locationManager.stopUpdatingLocation()
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
+        locationManager.stopUpdatingLocation()
         
         Task {
             do {
-                let weather = try await service.fetchWeather(lat: lat, lon: lon)
+                let weather = try await fetchWeather(lat: lat, lon: lon)
                 city = weather.city
                 weatherList = weather.list
             } catch {
@@ -65,7 +63,7 @@ extension WeatherViewModel {
         
         Task {
             do {
-                let list = try await service.fetchWeather(for: filteredCities)
+                let list = try await fetchWeather(for: filteredCities)
                 weatherList = list
             } catch {
                 print(error)
@@ -104,14 +102,16 @@ extension WeatherViewModel {
             return "cloud.rain"
         case 600...622:
             return "cloud.snow"
-        case 701...781:
+        case 701...780:
             return "cloud.fog"
+        case 781:
+            return "tornado"
         case 800:
             return "sun.max"
-        case 801...804:
-            return "cloud.bolt"
-        default:
+        case 803...804:
             return "cloud"
+        default:
+            return "cloud.sun"
         }
     }
     

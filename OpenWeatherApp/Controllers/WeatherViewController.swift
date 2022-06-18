@@ -17,7 +17,7 @@ class WeatherViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        vm = WeatherViewModel(service: WeatherService(), locDelegate: self, closure: updateUI)
+        vm = WeatherViewModel(locDelegate: self, closure: updateUI)
         addKeyboardDismiss()
         weatherTableView.allowsSelection = false
     }
