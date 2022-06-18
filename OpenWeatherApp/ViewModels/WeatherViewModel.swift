@@ -86,7 +86,7 @@ extension WeatherViewModel {
         let maxT = String(format: "%1.f", list.main.tempMax)
         let info = list.weather.first?.description ?? "undefined"
         let wSpeed = list.wind.speed
-        let description = "\(minT) - \(maxT) °C  \(info.capitalized) windspeed: \(wSpeed) m/s"
+        let description = "\(minT) - \(maxT) °C  \(info.capitalized), wind: \(wSpeed) m/s"
         return description
     }
     
@@ -125,7 +125,7 @@ extension WeatherViewModel {
         
         dateFormatter.timeZone = TimeZone(abbreviation: timezone)
         dateFormatter.locale = NSLocale.current
-        dateFormatter.dateFormat = "dd.MM.yy HH:mm"
+        dateFormatter.dateFormat = "MMM d, h:mm a"
         strDate = dateFormatter.string(from: date)
         
         return strDate
