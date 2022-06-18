@@ -12,6 +12,7 @@ class WeatherViewController: UIViewController {
 
     @IBOutlet weak var weatherTableView: UITableView!
     @IBOutlet weak var searchTextField: UITextField!
+    @IBOutlet weak var geoButton: UIButton!
     
     private var vm: WeatherViewModel!
     
@@ -23,6 +24,7 @@ class WeatherViewController: UIViewController {
     }
 
     @IBAction func geoButtonPressed() {
+        isLoading(true)
         vm.requestLocation()
     }
 }
@@ -83,7 +85,9 @@ extension WeatherViewController: CLLocationManagerDelegate {
 extension WeatherViewController {
     private func showAlert(_ message: String) {
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: .cancel)
+        let action = UIAlertAction(title: "OK", style: .cancel) { [weak self] _ in
+            self?.isLoading(false)
+        }
         alert.addAction(action)
         present(alert, animated: true)
     }
@@ -105,6 +109,7 @@ extension WeatherViewController {
         DispatchQueue.main.async { [weak self] in
             self?.weatherTableView.reloadData()
             self?.searchTextField.text = ""
+            self?.isLoading(false)
         }
     }
     
@@ -115,6 +120,12 @@ extension WeatherViewController {
         view.addGestureRecognizer(tapGesture)
         
         weatherTableView.keyboardDismissMode = .onDrag
+    }
+    
+    private func isLoading(_ bool: Bool) {
+        var config = geoButton.configuration
+        config?.showsActivityIndicator = bool
+        geoButton.configuration = config
     }
     
     @objc private func hideKeyboard() {

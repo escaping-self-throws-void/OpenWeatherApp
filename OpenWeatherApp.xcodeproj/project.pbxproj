@@ -112,9 +112,9 @@
 		CFFCD6DA285B126100F4B73F /* OpenWeatherApp */ = {
 			isa = PBXGroup;
 			children = (
-				CFFCD70F285B1A6200F4B73F /* Supporting Files */,
+				CFFCD70F285B1A6200F4B73F /* SupportingFiles */,
 				CFFCD70C285B12B300F4B73F /* Resources */,
-				CFFCD710285B1A7E00F4B73F /* Storyboards */,
+				CFFCD710285B1A7E00F4B73F /* Storyboard */,
 				CFFCD70B285B12A900F4B73F /* Controllers */,
 				CFDF66BB285CAFC6001B9A22 /* ViewModels */,
 				CFFCD713285B2A5000F4B73F /* Services */,
@@ -147,7 +147,7 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		CFFCD70F285B1A6200F4B73F /* Supporting Files */ = {
+		CFFCD70F285B1A6200F4B73F /* SupportingFiles */ = {
 			isa = PBXGroup;
 			children = (
 				CFFCD6DB285B126100F4B73F /* AppDelegate.swift */,
@@ -155,15 +155,15 @@
 				CFFCD6E6285B126200F4B73F /* LaunchScreen.storyboard */,
 				CFFCD6E9285B126200F4B73F /* Info.plist */,
 			);
-			path = "Supporting Files";
+			path = SupportingFiles;
 			sourceTree = "<group>";
 		};
-		CFFCD710285B1A7E00F4B73F /* Storyboards */ = {
+		CFFCD710285B1A7E00F4B73F /* Storyboard */ = {
 			isa = PBXGroup;
 			children = (
 				CFFCD6E1285B126100F4B73F /* Main.storyboard */,
 			);
-			path = Storyboards;
+			path = Storyboard;
 			sourceTree = "<group>";
 		};
 		CFFCD713285B2A5000F4B73F /* Services */ = {
@@ -449,7 +449,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = L7KZPDRX49;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "OpenWeatherApp/Supporting Files/Info.plist";
+				INFOPLIST_FILE = OpenWeatherApp/SupportingFiles/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -478,7 +478,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = L7KZPDRX49;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "OpenWeatherApp/Supporting Files/Info.plist";
+				INFOPLIST_FILE = OpenWeatherApp/SupportingFiles/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

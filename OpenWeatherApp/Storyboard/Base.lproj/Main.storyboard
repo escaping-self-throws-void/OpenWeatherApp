@@ -29,7 +29,7 @@
                                         <state key="normal" image="location" catalog="system"/>
                                         <buttonConfiguration key="configuration" style="plain" image="location" catalog="system"/>
                                         <connections>
-                                            <action selector="geoButtonPressed" destination="BYZ-38-t0r" eventType="touchUpInside" id="JTV-Kw-lhg"/>
+                                            <action selector="geoButtonPressed" destination="BYZ-38-t0r" eventType="touchUpInside" id="bsB-f2-ivc"/>
                                         </connections>
                                     </button>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter min 3 and max 7 cities" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OsE-DJ-vHK">
@@ -75,6 +75,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Open Weather" id="J4f-tc-utG"/>
                     <connections>
+                        <outlet property="geoButton" destination="2Vu-oX-Agd" id="J56-ey-s57"/>
                         <outlet property="searchTextField" destination="OsE-DJ-vHK" id="3kM-KQ-8Et"/>
                         <outlet property="weatherTableView" destination="Zyt-qg-W9g" id="iK2-fd-LJm"/>
                     </connections>
