@@ -13,20 +13,17 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var weatherTableView: UITableView!
     @IBOutlet weak var searchTextField: UITextField!
     
-    private let locationManager = CLLocationManager()
     private var vm: WeatherViewModel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        vm = WeatherViewModel(service: WeatherService(), closure: updateUI)
+        vm = WeatherViewModel(service: WeatherService(), locDelegate: self, closure: updateUI)
         addKeyboardDismiss()
         weatherTableView.allowsSelection = false
-        locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization()
     }
 
     @IBAction func geoButtonPressed() {
-        locationManager.requestLocation()
+        vm.requestLocation()
     }
 }
 
@@ -68,14 +65,9 @@ extension WeatherViewController: UITextFieldDelegate {
 
 extension WeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last {
-            locationManager.stopUpdatingLocation()
-            let lat = location.coordinate.latitude
-            let lon = location.coordinate.longitude
-            vm.getGeoWeather(lat: lat, lon: lon) { [weak self] errorText in
-                DispatchQueue.main.async {
-                    self?.showAlert(errorText)
-                }
+        vm.getGeoWeather(from: locations.last) { [weak self] errorText in
+            DispatchQueue.main.async {
+                self?.showAlert(errorText)
             }
         }
     }

@@ -17,15 +17,32 @@ final class WeatherViewModel {
     }
     private(set) var city: City?
     private(set) var switcher = true
+    private let locationManager = CLLocationManager()
+    
     private let service: WeatherServicable
     private var closure: (() -> Void)
     
-    init(service: WeatherServicable, closure: @escaping () -> Void) {
+    init(service: WeatherServicable, locDelegate: CLLocationManagerDelegate, closure: @escaping () -> Void) {
         self.service = service
         self.closure = closure
+        locationManager.delegate = locDelegate
+        locationManager.requestWhenInUseAuthorization()
     }
+}
+    
+// MARK: - Fetching methods
 
-    func getGeoWeather(lat: CLLocationDegrees, lon: CLLocationDegrees, failure: @escaping (String) -> Void) {
+extension WeatherViewModel {
+    func getGeoWeather(from location: CLLocation?, failure: @escaping (String) -> Void) {
+        guard let location = location else {
+            failure("Can not access location")
+            return
+        }
+        
+        locationManager.stopUpdatingLocation()
+        let lat = location.coordinate.latitude
+        let lon = location.coordinate.longitude
+        
         Task {
             do {
                 let weather = try await service.fetchWeather(lat: lat, lon: lon)
@@ -44,7 +61,7 @@ final class WeatherViewModel {
         let filteredCities = filterCities(cities)
         
         guard isValid(filteredCities.count) else {
-            failure("Plese enter minimum 3 and max 7 cities.")
+            failure("Plese enter minimum 3 and max 7 cities")
             return
         }
         
@@ -60,8 +77,21 @@ final class WeatherViewModel {
         switcher = false
     }
     
+    func requestLocation() {
+        locationManager.requestLocation()
+    }
+}
+
+// MARK: - Processing methods
+
+extension WeatherViewModel {
     func getDescription(_ list: List) -> String {
-        "\(list.main.tempMin) - \(list.main.tempMax) C " + (list.weather.first?.description ?? "undefined") + " windspeed: \(list.wind.speed)"
+        let minT = String(format: "%1.f", list.main.tempMin)
+        let maxT = String(format: "%1.f", list.main.tempMax)
+        let info = list.weather.first?.description ?? "undefined"
+        let wSpeed = list.wind.speed
+        let description = "\(minT) - \(maxT) °C  \(info) windspeed: \(wSpeed)"
+        return description
     }
     
     
@@ -80,7 +110,11 @@ final class WeatherViewModel {
         
         return strDate
     }
-    
+}
+
+// MARK: - Supporting methods
+
+extension WeatherViewModel {
     private func isValid(_ num: Int) -> Bool {
         (3...7).contains(num) ? true : false
     }
@@ -88,5 +122,4 @@ final class WeatherViewModel {
     private func filterCities(_ cities: String) -> [String] {
         cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
     }
-    
 }
