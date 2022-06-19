@@ -391,8 +391,6 @@ class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
 
 ## Authors
 
-Contributors names and contact info
-
  Paul Matar
  [@p_a_matar](https://twitter.com/p_a_matar)
 
