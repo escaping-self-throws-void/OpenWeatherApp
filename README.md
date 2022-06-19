@@ -403,4 +403,4 @@ This project is licensed under the MIT License - see the LICENSE.md file for det
 ## Acknowledgments
 
 
-* [Open Weather API](https://openweathermap.org)
+[Open Weather API](https://openweathermap.org)
