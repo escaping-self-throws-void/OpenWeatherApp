@@ -1,5 +1,7 @@
 # Open Weather App
-![180](https://user-images.githubusercontent.com/24648375/174477322-ad74dd9e-4931-48d2-aa55-c6afe416fa64.png)
+![weather-app](https://user-images.githubusercontent.com/24648375/174482761-9096c4fd-537d-4e98-9a03-3a4ddf9b0996.png)
+
+
 
 Small app to fetch the weather forecast of multiple cities.
 
@@ -391,8 +393,6 @@ class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
 
 ## Authors
 
-Contributors names and contact info
-
  Paul Matar
  [@p_a_matar](https://twitter.com/p_a_matar)
 
@@ -400,9 +400,9 @@ Contributors names and contact info
 
 ## License
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+This project is licensed under the MIT License - see the LICENSE.md file for details
 
 ## Acknowledgments
 
 
-* [Open Weather API](https://openweathermap.org)
+[Open Weather API](https://openweathermap.org)
