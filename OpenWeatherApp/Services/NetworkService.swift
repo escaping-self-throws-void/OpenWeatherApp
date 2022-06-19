@@ -12,6 +12,7 @@ protocol NetworkService {
 }
 
 extension NetworkService {
+    
     func fetch<T: Codable>(with endpoint: String) async throws -> T {
         guard let url = URL(string: endpoint) else {
             throw NError.invalidURL

@@ -13,6 +13,7 @@ protocol WeatherService: NetworkService {
 }
 
 extension WeatherService {
+    
     private var baseURL: String {
         "https://api.openweathermap.org/data/2.5/weather?units=metric&"
     }

@@ -15,7 +15,7 @@ class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
     
     override func setUp() {
         super.setUp()
-        viewModel = WeatherViewModel(locDelegate: self, closure: {})
+        viewModel = WeatherViewModel()
     }
     
     override func tearDown() {

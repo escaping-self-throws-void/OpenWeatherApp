@@ -10,20 +10,19 @@ import RxCocoa
 import RxSwift
 
 final class WeatherViewModel: WeatherService {
+    
+    let locationManager = CLLocationManager()
+    var callback: (() -> Void)?
+    
     private(set) var weatherList: [List] = [] {
         didSet {
-            closure()
+            callback?()
         }
     }
     private(set) var city: City?
     private(set) var switcher = true
-    private let locationManager = CLLocationManager()
     
-    private var closure: (() -> Void)
-    
-    init(locDelegate: CLLocationManagerDelegate, closure: @escaping () -> Void) {
-        self.closure = closure
-        locationManager.delegate = locDelegate
+    init() {
         locationManager.requestWhenInUseAuthorization()
     }
 }
@@ -75,9 +74,6 @@ extension WeatherViewModel {
         switcher = false
     }
     
-    func requestLocation() {
-        locationManager.requestLocation()
-    }
 }
 
 // MARK: - Processing methods
