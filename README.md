@@ -59,6 +59,7 @@ struct WeatherData: Codable {
     let list: [List]
     let city: City
 }
+...
 ```
 ### Generic Async/Await Network Layer
 
