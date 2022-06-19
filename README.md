@@ -60,9 +60,9 @@ struct WeatherData: Codable {
     let city: City
 }
 ```
-### Generic Network Layer
+### Generic Async/Await Network Layer
 
-Protocol Network Service with default implementation in extension.
+Protocol Network Service with default implementation in extension using generic type and async/await, introduced in Swift 5.5.
 
 ```
 protocol NetworkService {
@@ -122,17 +122,137 @@ extension NError: CustomStringConvertible {
 }
 ```
 
+And with custom localized description to show in alerts for user.
+
 ```
-code blocks for commands
+extension NError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .invalidData:
+            return "Server error, try again later"
+        case .unknown:
+            return "Uknown error, try again later"
+        default:
+            return "Wrong city names"
+        }
+    }
+}
 ```
+
+### Weather Service
+
+Protocol service confirming to Network Service protocol to fetch data from API with two methods - from input text and CLLocation.
+
+```
+protocol WeatherService: NetworkService {
+    func fetchWeather(for cities: [String]) async throws -> [List]
+    func fetchWeather(lat: CLLocationDegrees, lon: CLLocationDegrees) async throws -> WeatherData
+}
+```
+Default implementation in extension with encapsulated url and apiKey.
+
+```
+extension WeatherService {
+    private var baseURL: String {
+        "https://api.openweathermap.org/data/2.5/weather?units=metric&"
+    }
+    private var apiKey: String {
+        "appid=MyApiKey"
+    }
+    private var forecastURL: String {
+        "https://api.openweathermap.org/data/2.5/forecast?units=metric&"
+    }
+    
+    func fetchWeather(for cities: [String]) async throws -> [List] {
+        var lists: [List] = []
+        
+        for city in cities {
+            let stringUrl = baseURL + apiKey + "&q=\(city)"
+            async let list: List = fetch(with: stringUrl)
+            lists += [try await list]
+        }
+        
+        return lists
+    }
+    
+    func fetchWeather(lat: CLLocationDegrees, lon: CLLocationDegrees) async throws -> WeatherData {
+        let stringUrl = forecastURL + apiKey + "&lat=\(lat)&lon=\(lon)"
+        return try await fetch(with: stringUrl)
+    }
+}
+```
+### View Model
+
+
 
 
 ```
 code blocks for commands
 ```
-
 ```
 code blocks for commands
+```
+```
+code blocks for commands
+```
+```
+code blocks for commands
+```
+
+### Unit testing
+
+Testing View Model logic.
+
+```
+class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
+    
+    var viewModel: WeatherViewModel?
+    
+    override func setUp() {
+        super.setUp()
+        viewModel = WeatherViewModel(locDelegate: self, closure: {})
+    }
+    
+    override func tearDown() {
+        viewModel = nil
+        super.tearDown()
+    }
+    
+    func testDateTimeCreateWithRandomUnix() throws {
+        let unix = Double.random(in: 300...600)
+        let result = viewModel?.createDateTime(unix: unix)
+        XCTAssertNotNil(result)
+    }
+    
+    func testFetchWeatherWithCities() async throws {
+        let citis = ["Rome", "Toronto", "Byblos"]
+        let list = try await viewModel?.fetchWeather(for: citis)
+        XCTAssertNotNil(list)
+    }
+    
+    func testFetchWeatherFromGeoLocation() async throws {
+        let lon = Double.random(in: 1...50)
+        let lat = Double.random(in: 1...50)
+        
+        let data = try await viewModel?.fetchWeather(lat: lat, lon: lon)
+        XCTAssertNotNil(data)
+    }
+    
+    func testGetDescriptionFromList() async throws {
+        let citis = ["Rome", "Toronto", "Byblos"]
+        let list = try await viewModel?.fetchWeather(for: citis)
+        let description = viewModel?.getDescription((list?.first)!)
+        XCTAssertNotNil(description)
+    }
+    
+    func testGetImageFromList() async throws {
+        let citis = ["Rome", "Toronto", "Byblos"]
+        let list = try await viewModel?.fetchWeather(for: citis)
+        let strImage = viewModel?.getImage((list?.first)!)
+        let image = UIImage(systemName: strImage!)
+        XCTAssertNotNil(image)
+    }
+}
 ```
 
 
