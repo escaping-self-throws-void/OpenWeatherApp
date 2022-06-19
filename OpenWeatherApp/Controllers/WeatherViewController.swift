@@ -14,18 +14,23 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var searchTextField: UITextField!
     @IBOutlet weak var geoButton: UIButton!
     
-    private var weatherViewModel: WeatherViewModel!
+    private var weatherViewModel: WeatherViewModel! {
+        didSet {
+            weatherViewModel.callback = updateUI
+            weatherViewModel.locationManager.delegate = self
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupBackgroundImage()
         dismissKeyboardOnTap()
-        weatherViewModel = WeatherViewModel(locDelegate: self, closure: updateUI)
+        weatherViewModel = WeatherViewModel()
     }
     
     @IBAction func geoButtonPressed() {
         isLoading(true)
-        weatherViewModel.requestLocation()
+        weatherViewModel.locationManager.requestLocation()
     }
 }
 
@@ -72,7 +77,11 @@ extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension WeatherViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        searchPressed()
+        weatherViewModel.getCitiesForecast(searchTextField.text) { [weak self] errorText in
+            DispatchQueue.main.async {
+                self?.showAlert(errorText)
+            }
+        }
         searchTextField.resignFirstResponder()
         return true
     }
@@ -110,13 +119,6 @@ extension WeatherViewController {
 // MARK: - Private methods
 
 extension WeatherViewController {
-    private func searchPressed() {
-        weatherViewModel.getCitiesForecast(searchTextField.text) { [weak self] errorText in
-            DispatchQueue.main.async {
-                self?.showAlert(errorText)
-            }
-        }
-    }
     
     private func updateUI() {
         DispatchQueue.main.async { [weak self] in
