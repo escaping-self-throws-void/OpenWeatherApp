@@ -48,7 +48,7 @@ Small app to fetch the weather forecast of multiple cities.
 
 ### Dependencies
 
-* No third-party dependencies were used
+* RxSwift (on test branch)
 
 ## In-depth 
 
@@ -385,6 +385,9 @@ class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
     }
 }
 ```
+## RxSwift
+
+Second branch created to try RxSwift.
 
 
 ## Authors
