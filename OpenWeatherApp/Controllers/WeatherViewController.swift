@@ -7,6 +7,8 @@
 
 import UIKit
 import CoreLocation
+import RxSwift
+import RxCocoa
 
 class WeatherViewController: UIViewController {
     
@@ -14,18 +16,16 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var searchTextField: UITextField!
     @IBOutlet weak var geoButton: UIButton!
     
-    private var weatherViewModel: WeatherViewModel! {
-        didSet {
-            weatherViewModel.callback = updateUI
-            weatherViewModel.locationManager.delegate = self
-        }
-    }
+    private var weatherViewModel: WeatherViewModel!
+    private var bag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupBackgroundImage()
         dismissKeyboardOnTap()
         weatherViewModel = WeatherViewModel()
+        weatherViewModel.locationManager.delegate = self
+        bindTableView()
     }
     
     @IBAction func geoButtonPressed() {
@@ -36,40 +36,24 @@ class WeatherViewController: UIViewController {
 
 // MARK: - UITableView methods
 
-extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        weatherViewModel.weatherList.count
-    }
+extension WeatherViewController {
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell", for: indexPath)
-        let list = weatherViewModel.weatherList[indexPath.row]
+    private func bindTableView() {
+        weatherViewModel.weatherList.bind(to: weatherTableView.rx.items(cellIdentifier: "WeatherCell", cellType: UITableViewCell.self)) { row, model, cell in
+            var content = cell.defaultContentConfiguration()
+            let name = model.name != nil ? model.name : self.weatherViewModel.city?.name
+            content.text = "\(self.weatherViewModel.createDateTime(unix: model.dt)) - \(name ?? "undefined")"
+            content.secondaryText = self.weatherViewModel.getDescription(model)
+            content.secondaryTextProperties.font = .systemFont(ofSize: 12, weight: .medium)
+            content.image = UIImage(systemName: self.weatherViewModel.getImage(model))
+            cell.contentConfiguration = content
+            cell.backgroundColor = .clear
+        }.disposed(by: bag)
         
-        var content = cell.defaultContentConfiguration()
-        content.text = weatherViewModel.switcher ? weatherViewModel.createDateTime(unix: list.dt) : list.name
-        content.secondaryText = weatherViewModel.getDescription(list)
-        content.secondaryTextProperties.font = .systemFont(ofSize: 12, weight: .medium)
-        content.image = UIImage(systemName: weatherViewModel.getImage(list))
-        cell.contentConfiguration = content
-        cell.backgroundColor = .clear
-        
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = UITableViewHeaderFooterView()
-        var content = headerView.defaultContentConfiguration()
-        
-        content.text = weatherViewModel.switcher
-            ? weatherViewModel.city?.name
-            : weatherViewModel.createDateTime(unix: weatherViewModel.weatherList.first?.dt)
-        content.textProperties.font = .boldSystemFont(ofSize: 16)
-        content.textProperties.color = .label
-        
-        headerView.contentConfiguration = content
-        headerView.backgroundConfiguration = .clear()
-        
-        return headerView
+        weatherViewModel.weatherList.subscribe { _ in
+            self.updateUI()
+        }.disposed(by: bag)
+
     }
 }
 
@@ -122,7 +106,6 @@ extension WeatherViewController {
     
     private func updateUI() {
         DispatchQueue.main.async { [weak self] in
-            self?.weatherTableView.reloadData()
             self?.searchTextField.text = ""
             self?.isLoading(false)
         }

@@ -12,15 +12,9 @@ import RxSwift
 final class WeatherViewModel: WeatherService {
     
     let locationManager = CLLocationManager()
-    var callback: (() -> Void)?
     
-    private(set) var weatherList: [List] = [] {
-        didSet {
-            callback?()
-        }
-    }
+    private(set) var weatherList: BehaviorRelay<[List]> = BehaviorRelay(value: [])
     private(set) var city: City?
-    private(set) var switcher = true
     
     init() {
         locationManager.requestWhenInUseAuthorization()
@@ -44,13 +38,12 @@ extension WeatherViewModel {
             do {
                 let weather = try await fetchWeather(lat: lat, lon: lon)
                 city = weather.city
-                weatherList = weather.list
+                weatherList.accept(weather.list)
             } catch {
                 print(error)
                 failure(error.localizedDescription)
             }
         }
-        switcher = true
     }
     
     func getCitiesForecast(_ input: String?, failure: @escaping (String) -> Void) {
@@ -65,13 +58,12 @@ extension WeatherViewModel {
         Task {
             do {
                 let list = try await fetchWeather(for: filteredCities)
-                weatherList = list
+                weatherList.accept(list)
             } catch {
                 print(error)
                 failure(error.localizedDescription)
             }
         }
-        switcher = false
     }
     
 }

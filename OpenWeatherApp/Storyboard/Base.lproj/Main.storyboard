@@ -56,10 +56,6 @@
                                         <color key="tintColor" systemColor="systemPurpleColor"/>
                                     </tableViewCell>
                                 </prototypes>
-                                <connections>
-                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="jY8-tE-x8O"/>
-                                    <outlet property="delegate" destination="BYZ-38-t0r" id="I3S-NL-glz"/>
-                                </connections>
                             </tableView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
