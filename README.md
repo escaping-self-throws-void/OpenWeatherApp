@@ -262,6 +262,7 @@ extension WeatherViewModel {
         }
         switcher = false
     }
+}
     
 extension WeatherViewModel {
     private func isValid(_ num: Int) -> Bool {
@@ -272,11 +273,62 @@ extension WeatherViewModel {
         cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
     }
 }
-
-}
 ```
+
+Processing methods to provide description, image and date format to View Controller.
+
 ```Swift
-code blocks for commands
+extension WeatherViewModel {
+    func getDescription(_ list: List) -> String {
+        let minT = String(format: "%1.f", list.main.tempMin)
+        let maxT = String(format: "%1.f", list.main.tempMax)
+        let info = list.weather.first?.description ?? "undefined"
+        let wSpeed = list.wind.speed
+        let description = "\(minT) - \(maxT) °C  \(info.capitalized), wind: \(wSpeed) m/s"
+        return description
+    }
+    
+    func getImage(_ list: List) -> String {
+        let code = list.weather.first?.id ?? 0
+        
+        switch code {
+        case 200...232:
+            return "cloud.bolt"
+        case 300...321:
+            return "cloud.drizzle"
+        case 500...531:
+            return "cloud.rain"
+        case 600...622:
+            return "cloud.snow"
+        case 701...780:
+            return "cloud.fog"
+        case 781:
+            return "tornado"
+        case 800:
+            return "sun.max"
+        case 803...804:
+            return "cloud"
+        default:
+            return "cloud.sun"
+        }
+    }
+    
+    func createDateTime(unix: Double?) -> String {
+        var strDate = "undefined"
+        guard let unix = unix else { return strDate }
+        
+        let date = Date(timeIntervalSince1970: unix)
+        let dateFormatter = DateFormatter()
+        let timezone = TimeZone.current.abbreviation() ?? "CET"
+        
+        dateFormatter.timeZone = TimeZone(abbreviation: timezone)
+        dateFormatter.locale = NSLocale.current
+        dateFormatter.dateFormat = "MMM d, h:mm a"
+        strDate = dateFormatter.string(from: date)
+        
+        return strDate
+    }
+}
 ```
 
 ### Unit testing
