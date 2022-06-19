@@ -6,6 +6,8 @@
 //
 
 import CoreLocation
+import RxCocoa
+import RxSwift
 
 final class WeatherViewModel: WeatherService {
     private(set) var weatherList: [List] = [] {
