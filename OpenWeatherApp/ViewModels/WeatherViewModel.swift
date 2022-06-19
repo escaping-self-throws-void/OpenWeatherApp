@@ -30,8 +30,8 @@ extension WeatherViewModel {
             return
         }
         
-        let lat = location.coordinate.latitude
-        let lon = location.coordinate.longitude
+        let lat = location.coordinate.latitude, lon = location.coordinate.longitude
+        
         locationManager.stopUpdatingLocation()
         
         Task {
