@@ -387,8 +387,10 @@ class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
 ```
 ## RxSwift
 
-Second branch created to try RxSwift.
+Second branch created to try RxSwift. 
 
+
+Succeeded to implement logic from main branch.
 
 ## Authors
 
