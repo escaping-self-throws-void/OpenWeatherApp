@@ -197,24 +197,20 @@ Observable array to populate Table View with closure to update UI.
 ```Swift
     private(set) var weatherList: [List] = [] {
         didSet {
-            closure()
+            callback?()
         }
     }
     
-    private var closure: (() -> Void)
+    var callback: (() -> Void)?
 ```
 Location manager encapsulated in View Model and Boolean property to show different data in the same Table View.
 
 ```Swift
+    let locationManager = CLLocationManager()
     private(set) var city: City?
     private(set) var switcher = true
-    private let locationManager = CLLocationManager()
     
-    
-    
-    init(locDelegate: CLLocationManagerDelegate, closure: @escaping () -> Void) {
-        self.closure = closure
-        locationManager.delegate = locDelegate
+    init() {
         locationManager.requestWhenInUseAuthorization()
     }
 ```
