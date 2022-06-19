@@ -54,7 +54,7 @@ Small app to fetch the weather forecast of multiple cities.
 
 Codable model used to decode from JSON.
 
-```
+```Swift
 struct WeatherData: Codable {
     let list: [List]
     let city: City
@@ -62,9 +62,9 @@ struct WeatherData: Codable {
 ```
 ### Generic Async/Await Network Layer
 
-Protocol Network Service with default implementation in extension using generic type and async/await, introduced in Swift 5.5.
+Protocol Network Service with default implementation in extension using generic type, URLSession and async/await, introduced in Swift 5.5.
 
-```
+```Swift
 protocol NetworkService {
     func fetch<T: Codable>(with endpoint: String) async throws -> T
 }
@@ -95,7 +95,7 @@ extension NetworkService {
 
 Custom network ErrorType with custom internal description.
 
-```
+```Swift
 enum NError: Error {
     case invalidURL
     case invalidResponse
@@ -124,7 +124,7 @@ extension NError: CustomStringConvertible {
 
 And with custom localized description to show in alerts for user.
 
-```
+```Swift
 extension NError: LocalizedError {
     var errorDescription: String? {
         switch self {
@@ -143,7 +143,7 @@ extension NError: LocalizedError {
 
 Protocol service confirming to Network Service protocol to fetch data from API with two methods - from input text and CLLocation.
 
-```
+```Swift
 protocol WeatherService: NetworkService {
     func fetchWeather(for cities: [String]) async throws -> [List]
     func fetchWeather(lat: CLLocationDegrees, lon: CLLocationDegrees) async throws -> WeatherData
@@ -151,7 +151,7 @@ protocol WeatherService: NetworkService {
 ```
 Default implementation in extension with encapsulated url and apiKey.
 
-```
+```Swift
 extension WeatherService {
     private var baseURL: String {
         "https://api.openweathermap.org/data/2.5/weather?units=metric&"
@@ -183,19 +183,99 @@ extension WeatherService {
 ```
 ### View Model
 
+Weather View Model as a final class, confirming to Weather Service protocol.
 
+```Swift
+final class WeatherViewModel: WeatherService {
+```
 
+Observable array to populate Table View with closure to update UI.
 
+```Swift
+    private(set) var weatherList: [List] = [] {
+        didSet {
+            closure()
+        }
+    }
+    
+    private var closure: (() -> Void)
 ```
-code blocks for commands
+Location manager encapsulated in View Model and Boolean property to show different data in the same Table View.
+
+```Swift
+    private(set) var city: City?
+    private(set) var switcher = true
+    private let locationManager = CLLocationManager()
+    
+    
+    
+    init(locDelegate: CLLocationManagerDelegate, closure: @escaping () -> Void) {
+        self.closure = closure
+        locationManager.delegate = locDelegate
+        locationManager.requestWhenInUseAuthorization()
+    }
 ```
+Fetching methods to update internal properties with text validation of Text Field input.
+
+```Swift
+extension WeatherViewModel {
+    func getGeoWeather(from location: CLLocation?, failure: @escaping (String) -> Void) {
+        guard let location = location else {
+            failure("Can not access location")
+            return
+        }
+        
+        let lat = location.coordinate.latitude
+        let lon = location.coordinate.longitude
+        locationManager.stopUpdatingLocation()
+        
+        Task {
+            do {
+                let weather = try await fetchWeather(lat: lat, lon: lon)
+                city = weather.city
+                weatherList = weather.list
+            } catch {
+                print(error)
+                failure(error.localizedDescription)
+            }
+        }
+        switcher = true
+    }
+    
+    func getCitiesForecast(_ input: String?, failure: @escaping (String) -> Void) {
+        guard let cities = input else { return }
+        let filteredCities = filterCities(cities)
+        
+        guard isValid(filteredCities.count) else {
+            failure("Plese enter minimum 3 and max 7 cities")
+            return
+        }
+        
+        Task {
+            do {
+                let list = try await fetchWeather(for: filteredCities)
+                weatherList = list
+            } catch {
+                print(error)
+                failure(error.localizedDescription)
+            }
+        }
+        switcher = false
+    }
+    
+extension WeatherViewModel {
+    private func isValid(_ num: Int) -> Bool {
+        (3...7).contains(num) ? true : false
+    }
+    
+    private func filterCities(_ cities: String) -> [String] {
+        cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
+    }
+}
+
+}
 ```
-code blocks for commands
-```
-```
-code blocks for commands
-```
-```
+```Swift
 code blocks for commands
 ```
 
@@ -203,7 +283,7 @@ code blocks for commands
 
 Testing View Model logic.
 
-```
+```Swift
 class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
     
     var viewModel: WeatherViewModel?
