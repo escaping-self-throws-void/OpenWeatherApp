@@ -16,7 +16,7 @@ Small app to fetch the weather forecast of multiple cities.
 ### Search multiple cities
 * The app accepts multiple city names from the user(comma separated) and display following attributes using API to fetch current temperatures: • temperature (min and max) • weather (description) • wind speed
 * User should enter minimum 3 cities and max 7 citiees. 
-* Alert will pop up in case of wrong input.
+* Alerts will pop up in case of wrong input.
 * The list returns in order of user's query input.
 
 ![Simulator Screen Shot - iPhone 13 Pro - 2022-06-19 at 13 50 05](https://user-images.githubusercontent.com/24648375/174477508-96abe1b2-bf38-4dcb-a627-3d731c9fd396.png)
@@ -39,25 +39,102 @@ Small app to fetch the weather forecast of multiple cities.
 
 * MVVM 
 
-### Installing
+### Concepts
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
+* SOLID
+* Object-oriented programming
 
 ### Dependencies
 
-* No dependencies were used
+* No third-party dependencies were used
+
+## In-depth 
+
+### Model 
+
+Codable model used to decode from JSON.
+
+```
+struct WeatherData: Codable {
+    let list: [List]
+    let city: City
+}
+```
+### Generic Network Layer
+
+Protocol Network Service with default implementation in extension.
+
+```
+protocol NetworkService {
+    func fetch<T: Codable>(with endpoint: String) async throws -> T
+}
+
+extension NetworkService {
+    func fetch<T: Codable>(with endpoint: String) async throws -> T {
+        guard let url = URL(string: endpoint) else {
+            throw NError.invalidURL
+        }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw NError.invalidResponse
+        }
+        
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        guard let decodedResponse = try? decoder.decode(T.self, from: data) else {
+            throw NError.unableToDecode
+        }
+        
+        return decodedResponse
+    }
+}
+```
+
+Custom network ErrorType with custom internal description.
+
+```
+enum NError: Error {
+    case invalidURL
+    case invalidResponse
+    case invalidData
+    case unableToDecode
+    case unknown
+}
+
+extension NError: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .invalidURL:
+            return "Bad URL"
+        case .invalidResponse:
+            return "The server did not return 200"
+        case .invalidData:
+            return "Bad data returned"
+        case .unableToDecode:
+            return "Unable to decode JSON"
+        case .unknown:
+            return "Unknown error"
+        }
+    }
+}
+```
 
 ```
 code blocks for commands
 ```
 
-## Help
 
-Any advise for common problems or issues.
 ```
-command to run if program contains helper info
+code blocks for commands
 ```
+
+```
+code blocks for commands
+```
+
 
 ## Authors
 
