@@ -368,16 +368,48 @@ extension WeatherViewModel {
 
 ### Unit testing
 
-Testing View Model logic.
+Mockable protocol to test network layer with loadJSON function, which reads an internal .json files and converts them into Codable Model.
+
+<img width="300" alt="Screen Shot 2022-06-24 at 8 33 16 PM" src="https://user-images.githubusercontent.com/24648375/175613189-cacb60ab-b040-4232-8135-77204ba514fb.png">
+
 
 ```Swift
-class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
+class WeatherFetchServiceMock: WeatherFetchService, MockableService {
+    func fetchWeather(for cities: [String]) async throws -> [List] {
+        if cities.first == "Foo" {
+            throw NError.unknown
+        }
+        let list: List = loadJSON(filename: "cities")
+        return [list]
+    }
     
-    var viewModel: WeatherViewModel?
+    func fetchWeather(lat: CLLocationDegrees, lon: CLLocationDegrees) async throws -> WeatherData {
+        if lat == 13, lon == 13 {
+            throw NError.invalidData
+        }
+        let data: WeatherData = loadJSON(filename: "location")
+        return data
+    }
+}
+```
+
+
+View Model unit testing with Mock View Model confirming to Weather View Model protocol. 
+
+```Swift
+class OpenWeatherAppTests: XCTestCase {
+    
+    var viewModel: WeatherViewModelProtocol?
+    var list: List {
+        let indexPath = IndexPath(row: 0, section: 0)
+        let listForRow = viewModel?.getListForRow(at: indexPath)
+        return listForRow!
+    }
+    func mockCallback() {}
     
     override func setUp() {
         super.setUp()
-        viewModel = WeatherViewModel()
+        viewModel = WeatherViewModelMock(callback: mockCallback)
     }
     
     override func tearDown() {
@@ -385,39 +417,138 @@ class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
         super.tearDown()
     }
     
-    func testDateTimeCreateWithRandomUnix() throws {
-        let unix = Double.random(in: 300...600)
-        let result = viewModel?.createDateTime(unix: unix)
-        XCTAssertNotNil(result)
-    }
-    
-    func testFetchWeatherWithCities() async throws {
-        let citis = ["Rome", "Toronto", "Byblos"]
-        let list = try await viewModel?.fetchWeather(for: citis)
-        XCTAssertNotNil(list)
-    }
-    
-    func testFetchWeatherFromGeoLocation() async throws {
-        let lon = Double.random(in: 1...50)
-        let lat = Double.random(in: 1...50)
+    func testWeatherFetchServiceMock() async throws {
+        let assertionOne = "San Francisco"
+        let assertionTwo = "Beirut"
+        let serviceMock = WeatherFetchServiceMock()
+        let city: City?
+        let list: [List]
         
-        let data = try await viewModel?.fetchWeather(lat: lat, lon: lon)
-        XCTAssertNotNil(data)
+        do {
+            let weatherData = try await serviceMock.fetchWeather(lat: 0, lon: 0)
+            city = weatherData.city
+            list = try await serviceMock.fetchWeather(for: [])
+        } catch {
+            fatalError(error.localizedDescription)
+        }
+       
+        XCTAssertEqual(city?.name, assertionOne)
+        XCTAssertEqual(list.first?.name, assertionTwo)
     }
     
-    func testGetDescriptionFromList() async throws {
-        let citis = ["Rome", "Toronto", "Byblos"]
-        let list = try await viewModel?.fetchWeather(for: citis)
-        let description = viewModel?.getDescription((list?.first)!)
-        XCTAssertNotNil(description)
+    func testGetGeoWeatherFailure() {
+        let assertion = "Server error, try again later"
+        let expectation = expectation(description: "Fetching failed")
+        var errorText: String?
+        let loc = CLLocation(latitude: 13, longitude: 13)
+        
+        viewModel?.getGeoWeather(loc, failure: { text in
+            errorText = text
+            expectation.fulfill()
+        })
+        
+        waitForExpectations(timeout: 1)
+
+        XCTAssertNotNil(errorText)
+        XCTAssertEqual(errorText, assertion)
     }
     
-    func testGetImageFromList() async throws {
-        let citis = ["Rome", "Toronto", "Byblos"]
-        let list = try await viewModel?.fetchWeather(for: citis)
-        let strImage = viewModel?.getImage((list?.first)!)
-        let image = UIImage(systemName: strImage!)
-        XCTAssertNotNil(image)
+    func testGetCitiesForecastFailure() {
+        let assertion = "Uknown error, try again later"
+        let expectation = expectation(description: "Fetching failed")
+        var errorText: String?
+        
+        viewModel?.getCitiesForecast("Foo", failure: { text in
+                errorText = text
+                expectation.fulfill()
+        })
+        
+        waitForExpectations(timeout: 1)
+        
+        XCTAssertNotNil(errorText)
+        XCTAssertEqual(errorText, assertion)
+    }
+    
+    func testNumberOfRows() {
+        let assertion = 1
+        let rows = viewModel?.numberOfRows()
+        XCTAssertEqual(rows, assertion)
+    }
+    
+    func testGetListForRow() throws {
+        let assertion = "Beirut"
+        let indexPath = IndexPath(row: 0, section: 0)
+        
+        let list = viewModel?.getListForRow(at: indexPath)
+
+        XCTAssertNotNil(list)
+        XCTAssertEqual(list?.name, assertion)
+    }
+    
+    func testGetLabelText() {
+        let assertion = "Jun 24, 2:48 PM"
+        let text = viewModel?.getLabelText(list)
+        XCTAssertEqual(text, assertion)
+    }
+    
+    func testGetHeaderText() {
+        let assertion = "San Francisco"
+        let headerText = viewModel?.getHeaderText()
+        XCTAssertEqual(headerText, assertion)
+    }
+    
+    func testGetDescription() {
+        let assertion = "28 - 33 °C  Few Clouds, wind: 5.66 m/s"
+        let description = viewModel?.getDescription(list)
+        XCTAssertEqual(description, assertion)
+    }
+    
+    func testGetImage() {
+        let assertion = "cloud.sun"
+        let image = viewModel?.getImage(list)
+        XCTAssertEqual(image, assertion)
+    }
+    
+    func testDateTimeCreateWithRandomUnix() {
+        let assertion = "undefined"
+        let mockViewModel = WeatherViewModelMock(callback: mockCallback)
+        let unix = Double.random(in: 300...600)
+        let result = mockViewModel.createDateTime(unix: unix)
+        XCTAssertNotNil(result)
+        XCTAssertNotEqual(result, assertion)
+    }
+    
+    func testIsValidMethod() {
+        let assertionOne = 0
+        let assertionTwo = -3
+        let assertionThree = 4
+        let assertionFour = 9
+        
+        let mockViewModel = WeatherViewModelMock(callback: mockCallback)
+        
+        XCTAssertFalse(mockViewModel.isValid(assertionOne))
+        XCTAssertFalse(mockViewModel.isValid(assertionTwo))
+        XCTAssertTrue(mockViewModel.isValid(assertionThree))
+        XCTAssertFalse(mockViewModel.isValid(assertionFour))
+    }
+    
+    func testFilterCitiesMethod() {
+        let assertionOne = ["FooBarBaz"]
+        let assertionTwo = ["foo", "Bar", "baz"]
+        let assertionThree = ["foOBarr", "Baz"]
+        let assertionFour = ["FOOBarBaz"]
+        
+        let mockOne = "Foo Bar Baz"
+        let mockTwo = "foo, Bar, baz"
+        let mockThree = "foO1. Barr, Baz-2"
+        let mockFour = "FOOBar  Baz"
+        
+        let mockViewModel = WeatherViewModelMock(callback: mockCallback)
+
+        XCTAssertEqual(mockViewModel.filterCities(mockOne), assertionOne)
+        XCTAssertEqual(mockViewModel.filterCities(mockTwo), assertionTwo)
+        XCTAssertEqual(mockViewModel.filterCities(mockThree), assertionThree)
+        XCTAssertEqual(mockViewModel.filterCities(mockFour), assertionFour)
     }
 }
 ```
