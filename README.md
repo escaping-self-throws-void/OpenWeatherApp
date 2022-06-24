@@ -142,12 +142,12 @@ extension NError: LocalizedError {
 }
 ```
 
-### Weather Service
+### Weather Fetch Service
 
 Protocol service confirming to Network Service protocol to fetch data from API with two methods - from input text and CLLocation.
 
 ```Swift
-protocol WeatherService: NetworkService {
+protocol WeatherFetchService: NetworkService {
     func fetchWeather(for cities: [String]) async throws -> [List]
     func fetchWeather(lat: CLLocationDegrees, lon: CLLocationDegrees) async throws -> WeatherData
 }
@@ -155,7 +155,7 @@ protocol WeatherService: NetworkService {
 Default implementation in extension with encapsulated url and apiKey.
 
 ```Swift
-extension WeatherService {
+extension WeatherFetchService {
     private var baseURL: String {
         "https://api.openweathermap.org/data/2.5/weather?units=metric&"
     }
@@ -186,7 +186,7 @@ extension WeatherService {
 ```
 ### View Model
 
-Weather View Model protocol as a public interface confirming to Weather Service.
+Weather View Model protocol as a public interface confirming to Weather Fetch Service.
 
 ```Swift
 protocol WeatherViewModelProtocol: WeatherFetchService {
