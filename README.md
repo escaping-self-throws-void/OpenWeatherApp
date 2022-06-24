@@ -204,7 +204,7 @@ protocol WeatherViewModelProtocol: WeatherFetchService {
     func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void)
 }
 ```
-Weather View Model final class 
+Weather View Model final class with implementation of protocol's methods.
 
 ```Swift
 final class WeatherViewModel: WeatherService {
@@ -213,41 +213,35 @@ final class WeatherViewModel: WeatherService {
     }
 ```
 
-Observable array to populate Table View with closure to update UI.
+Observable internal Model with closure to update UI.
 
 ```Swift
-    private(set) var weatherList: [List] = [] {
+    private var callback: (() -> Void)
+    
+    private var weatherList: [List] = [] {
         didSet {
             callback()
         }
-    }
-    
-    private var callback: (() -> Void)
+    }  
+    private var city: City?
 ```
-Location manager encapsulated in View Model and Boolean property to show different data in the same Table View.
+Boolean property to show different data in the same Table View.
 
 ```Swift
-    let locationManager = CLLocationManager()
-    private(set) var city: City?
-    private(set) var switcher = true
-    
-    init() {
-        locationManager.requestWhenInUseAuthorization()
-    }
+    private var switcher = true
 ```
-Fetching methods to update internal properties with text validation of Text Field input.
+Fetching methods to update internal Model.
 
 ```Swift
 extension WeatherViewModel {
-    func getGeoWeather(from location: CLLocation?, failure: @escaping (String) -> Void) {
-        guard let location = location else {
+    func getGeoWeather(_ loc: CLLocation?, failure: @escaping (String) -> Void) {
+        guard let location = loc else {
             failure("Can not access location")
             return
         }
         
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
-        locationManager.stopUpdatingLocation()
         
         Task {
             do {
@@ -262,8 +256,8 @@ extension WeatherViewModel {
         switcher = true
     }
     
-    func getCitiesForecast(_ input: String?, failure: @escaping (String) -> Void) {
-        guard let cities = input else { return }
+    func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void) {
+        guard let cities = city else { return }
         let filteredCities = filterCities(cities)
         
         guard isValid(filteredCities.count) else {
@@ -283,22 +277,27 @@ extension WeatherViewModel {
         switcher = false
     }
 }
-    
-extension WeatherViewModel {
-    private func isValid(_ num: Int) -> Bool {
-        (3...7).contains(num) ? true : false
-    }
-    
-    private func filterCities(_ cities: String) -> [String] {
-        cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
-    }
-}
 ```
-
-Processing methods to provide description, image and date format to View Controller.
+Methods to provide data for the TableView and View Controller.
 
 ```Swift
 extension WeatherViewModel {
+    func numberOfRows() -> Int {
+        weatherList.count
+    }
+    
+    func getListForRow(at indexPath: IndexPath) -> List {
+        weatherList[indexPath.row]
+    }
+    
+    func getLabelText(_ list: List) -> String? {
+        switcher ? createDateTime(unix: list.dt) : list.name
+    }
+    
+    func getHeaderText() -> String? {
+        switcher ? city?.name : createDateTime(unix: weatherList.first?.dt)
+    }
+    
     func getDescription(_ list: List) -> String {
         let minT = String(format: "%1.f", list.main.tempMin)
         let maxT = String(format: "%1.f", list.main.tempMax)
@@ -332,8 +331,14 @@ extension WeatherViewModel {
             return "cloud.sun"
         }
     }
-    
-    func createDateTime(unix: Double?) -> String {
+}
+```
+
+Supporting private methods for formatting and text validation of Text Field input.
+
+```Swift    
+extension WeatherViewModel {
+    private func createDateTime(unix: Double?) -> String {
         var strDate = "undefined"
         guard let unix = unix else { return strDate }
         
@@ -348,8 +353,18 @@ extension WeatherViewModel {
         
         return strDate
     }
+    
+    private func isValid(_ num: Int) -> Bool {
+        (3...7).contains(num) ? true : false
+    }
+    
+    private func filterCities(_ cities: String) -> [String] {
+        cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
+    }
 }
 ```
+
+
 
 ### Unit testing
 
