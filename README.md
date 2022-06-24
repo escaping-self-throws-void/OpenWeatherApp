@@ -186,7 +186,7 @@ extension WeatherService {
 ```
 ### View Model
 
-Weather View Model protocol confirming to Weather Service protocol as a public interface.
+Weather View Model protocol as a public interface confirming to Weather Service.
 
 ```Swift
 protocol WeatherViewModelProtocol: WeatherFetchService {
@@ -204,7 +204,7 @@ protocol WeatherViewModelProtocol: WeatherFetchService {
     func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void)
 }
 ```
-Weather View Model final class with implementation of protocol's methods.
+Weather View Model final class with implementation of protocol methods.
 
 ```Swift
 final class WeatherViewModel: WeatherService {
@@ -278,7 +278,7 @@ extension WeatherViewModel {
     }
 }
 ```
-Methods to provide data for the TableView and View Controller.
+Methods to provide data for the Table View and View Controller.
 
 ```Swift
 extension WeatherViewModel {
