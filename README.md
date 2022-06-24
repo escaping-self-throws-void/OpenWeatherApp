@@ -186,10 +186,31 @@ extension WeatherService {
 ```
 ### View Model
 
-Weather View Model as a final class, confirming to Weather Service protocol.
+Weather View Model protocol confirming to Weather Service protocol as a public interface.
+
+```Swift
+protocol WeatherViewModelProtocol: WeatherFetchService {
+    init(callback: @escaping () -> Void)
+    
+    func numberOfRows() -> Int
+    func getListForRow(at indexPath: IndexPath) -> List
+    
+    func getLabelText(_ list: List) -> String?
+    func getDescription(_ list: List) -> String
+    func getImage(_ list: List) -> String
+    func getHeaderText() -> String?
+    
+    func getGeoWeather(_ loc: CLLocation?, failure: @escaping (String) -> Void)
+    func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void)
+}
+```
+Weather View Model final class 
 
 ```Swift
 final class WeatherViewModel: WeatherService {
+    init(callback: @escaping () -> Void) {
+        self.callback = callback
+    }
 ```
 
 Observable array to populate Table View with closure to update UI.
@@ -197,11 +218,11 @@ Observable array to populate Table View with closure to update UI.
 ```Swift
     private(set) var weatherList: [List] = [] {
         didSet {
-            callback?()
+            callback()
         }
     }
     
-    var callback: (() -> Void)?
+    private var callback: (() -> Void)
 ```
 Location manager encapsulated in View Model and Boolean property to show different data in the same Table View.
 
