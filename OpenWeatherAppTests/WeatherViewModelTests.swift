@@ -6,23 +6,17 @@
 //
 
 import XCTest
+import RxSwift
 import CoreLocation
 @testable import OpenWeatherApp
 
 class OpenWeatherAppTests: XCTestCase {
     
-    var viewModel: WeatherViewModelProtocol?
-    var list: List {
-        let indexPath = IndexPath(row: 0, section: 0)
-        let listForRow = viewModel?.getListForRow(at: indexPath)
-        return listForRow!
-    }
-    func mockCallback() {}
-    
+    var viewModel: WeatherViewModelProtocol!
     
     override func setUp() {
         super.setUp()
-        viewModel = WeatherViewModelMock(callback: mockCallback)
+        viewModel = WeatherViewModelMock()
     }
     
     override func tearDown() {
@@ -82,49 +76,33 @@ class OpenWeatherAppTests: XCTestCase {
         XCTAssertEqual(errorText, assertion)
     }
     
-    func testNumberOfRows() {
-        let assertion = 1
-        let rows = viewModel?.numberOfRows()
-        XCTAssertEqual(rows, assertion)
-    }
-    
-    func testGetListForRow() throws {
-        let assertion = "Beirut"
-        let indexPath = IndexPath(row: 0, section: 0)
-        
-        let list = viewModel?.getListForRow(at: indexPath)
-
-        XCTAssertNotNil(list)
-        XCTAssertEqual(list?.name, assertion)
-    }
     
     func testGetLabelText() {
-        let assertion = "Jun 24, 2:48 PM"
+        let assertion = "июня 24, 2:48 PM - Beirut"
+        let list: List = viewModel.weatherList.value.first!
+        
         let text = viewModel?.getLabelText(list)
         XCTAssertEqual(text, assertion)
     }
     
-    func testGetHeaderText() {
-        let assertion = "San Francisco"
-        let headerText = viewModel?.getHeaderText()
-        XCTAssertEqual(headerText, assertion)
-    }
-    
     func testGetDescription() {
         let assertion = "28 - 33 °C  Few Clouds, wind: 5.66 m/s"
+        let list: List = viewModel.weatherList.value.first!
+        
         let description = viewModel?.getDescription(list)
         XCTAssertEqual(description, assertion)
     }
-    
+
     func testGetImage() {
         let assertion = "cloud.sun"
+        let list: List = viewModel.weatherList.value.first!
         let image = viewModel?.getImage(list)
         XCTAssertEqual(image, assertion)
     }
     
     func testDateTimeCreateWithRandomUnix() {
         let assertion = "undefined"
-        let mockViewModel = WeatherViewModelMock(callback: mockCallback)
+        let mockViewModel = WeatherViewModelMock()
         let unix = Double.random(in: 300...600)
         let result = mockViewModel.createDateTime(unix: unix)
         XCTAssertNotNil(result)
@@ -137,7 +115,7 @@ class OpenWeatherAppTests: XCTestCase {
         let assertionThree = 4
         let assertionFour = 9
         
-        let mockViewModel = WeatherViewModelMock(callback: mockCallback)
+        let mockViewModel = WeatherViewModelMock()
         
         XCTAssertFalse(mockViewModel.isValid(assertionOne))
         XCTAssertFalse(mockViewModel.isValid(assertionTwo))
@@ -156,7 +134,7 @@ class OpenWeatherAppTests: XCTestCase {
         let mockThree = "foO1. Barr, Baz-2"
         let mockFour = "FOOBar  Baz"
         
-        let mockViewModel = WeatherViewModelMock(callback: mockCallback)
+        let mockViewModel = WeatherViewModelMock()
 
         XCTAssertEqual(mockViewModel.filterCities(mockOne), assertionOne)
         XCTAssertEqual(mockViewModel.filterCities(mockTwo), assertionTwo)

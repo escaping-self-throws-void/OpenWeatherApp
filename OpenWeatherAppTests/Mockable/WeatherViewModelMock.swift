@@ -6,16 +6,19 @@
 //
 
 import CoreLocation
+import RxCocoa
+import RxSwift
 @testable import OpenWeatherApp
 
 final class WeatherViewModelMock: WeatherFetchServiceMock, WeatherViewModelProtocol {
+    var weatherList: BehaviorRelay<[List]> = BehaviorRelay(value: [])
     
-    init(callback: @escaping () -> Void) {}
-        
-    private var weatherList: [List] {
+    override init() {
+        super.init()
         let list: List = loadJSON(filename: "cities")
-        return [list]
+        weatherList.accept([list])
     }
+    
     private var city: City? {
         let data: WeatherData = loadJSON(filename: "location")
         return data.city
@@ -64,20 +67,10 @@ extension WeatherViewModelMock {
 // MARK: - TableView methods
 
 extension WeatherViewModelMock {
-    func numberOfRows() -> Int {
-        weatherList.count
-    }
-    
-    func getListForRow(at indexPath: IndexPath) -> List {
-        weatherList[indexPath.row]
-    }
     
     func getLabelText(_ list: List) -> String? {
-        switcher ? createDateTime(unix: list.dt) : list.name
-    }
-    
-    func getHeaderText() -> String? {
-        switcher ? city?.name : createDateTime(unix: weatherList.first?.dt)
+        let name = list.name != nil ? list.name : city?.name
+        return "\(createDateTime(unix: list.dt)) - \(name ?? "undefined")"
     }
     
     func getDescription(_ list: List) -> String {
