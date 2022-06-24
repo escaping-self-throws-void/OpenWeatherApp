@@ -142,12 +142,12 @@ extension NError: LocalizedError {
 }
 ```
 
-### Weather Service
+### Weather Fetch Service
 
 Protocol service confirming to Network Service protocol to fetch data from API with two methods - from input text and CLLocation.
 
 ```Swift
-protocol WeatherService: NetworkService {
+protocol WeatherFetchService: NetworkService {
     func fetchWeather(for cities: [String]) async throws -> [List]
     func fetchWeather(lat: CLLocationDegrees, lon: CLLocationDegrees) async throws -> WeatherData
 }
@@ -155,7 +155,7 @@ protocol WeatherService: NetworkService {
 Default implementation in extension with encapsulated url and apiKey.
 
 ```Swift
-extension WeatherService {
+extension WeatherFetchService {
     private var baseURL: String {
         "https://api.openweathermap.org/data/2.5/weather?units=metric&"
     }
@@ -186,47 +186,62 @@ extension WeatherService {
 ```
 ### View Model
 
-Weather View Model as a final class, confirming to Weather Service protocol.
+Weather View Model protocol as a public interface confirming to Weather Fetch Service.
+
+```Swift
+protocol WeatherViewModelProtocol: WeatherFetchService {
+    init(callback: @escaping () -> Void)
+    
+    func numberOfRows() -> Int
+    func getListForRow(at indexPath: IndexPath) -> List
+    
+    func getLabelText(_ list: List) -> String?
+    func getDescription(_ list: List) -> String
+    func getImage(_ list: List) -> String
+    func getHeaderText() -> String?
+    
+    func getGeoWeather(_ loc: CLLocation?, failure: @escaping (String) -> Void)
+    func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void)
+}
+```
+Weather View Model final class with implementation of protocol methods.
 
 ```Swift
 final class WeatherViewModel: WeatherService {
+    init(callback: @escaping () -> Void) {
+        self.callback = callback
+    }
 ```
 
-Observable array to populate Table View with closure to update UI.
+Observable internal Model with closure to update UI.
 
 ```Swift
-    private(set) var weatherList: [List] = [] {
+    private var callback: (() -> Void)
+    
+    private var weatherList: [List] = [] {
         didSet {
-            callback?()
+            callback()
         }
-    }
-    
-    var callback: (() -> Void)?
+    }  
+    private var city: City?
 ```
-Location manager encapsulated in View Model and Boolean property to show different data in the same Table View.
+Boolean property to show different data in the same Table View.
 
 ```Swift
-    let locationManager = CLLocationManager()
-    private(set) var city: City?
-    private(set) var switcher = true
-    
-    init() {
-        locationManager.requestWhenInUseAuthorization()
-    }
+    private var switcher = true
 ```
-Fetching methods to update internal properties with text validation of Text Field input.
+Fetching methods to update internal Model.
 
 ```Swift
 extension WeatherViewModel {
-    func getGeoWeather(from location: CLLocation?, failure: @escaping (String) -> Void) {
-        guard let location = location else {
+    func getGeoWeather(_ loc: CLLocation?, failure: @escaping (String) -> Void) {
+        guard let location = loc else {
             failure("Can not access location")
             return
         }
         
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
-        locationManager.stopUpdatingLocation()
         
         Task {
             do {
@@ -241,8 +256,8 @@ extension WeatherViewModel {
         switcher = true
     }
     
-    func getCitiesForecast(_ input: String?, failure: @escaping (String) -> Void) {
-        guard let cities = input else { return }
+    func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void) {
+        guard let cities = city else { return }
         let filteredCities = filterCities(cities)
         
         guard isValid(filteredCities.count) else {
@@ -262,22 +277,27 @@ extension WeatherViewModel {
         switcher = false
     }
 }
-    
-extension WeatherViewModel {
-    private func isValid(_ num: Int) -> Bool {
-        (3...7).contains(num) ? true : false
-    }
-    
-    private func filterCities(_ cities: String) -> [String] {
-        cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
-    }
-}
 ```
-
-Processing methods to provide description, image and date format to View Controller.
+Methods to provide data for the Table View and View Controller.
 
 ```Swift
 extension WeatherViewModel {
+    func numberOfRows() -> Int {
+        weatherList.count
+    }
+    
+    func getListForRow(at indexPath: IndexPath) -> List {
+        weatherList[indexPath.row]
+    }
+    
+    func getLabelText(_ list: List) -> String? {
+        switcher ? createDateTime(unix: list.dt) : list.name
+    }
+    
+    func getHeaderText() -> String? {
+        switcher ? city?.name : createDateTime(unix: weatherList.first?.dt)
+    }
+    
     func getDescription(_ list: List) -> String {
         let minT = String(format: "%1.f", list.main.tempMin)
         let maxT = String(format: "%1.f", list.main.tempMax)
@@ -311,8 +331,14 @@ extension WeatherViewModel {
             return "cloud.sun"
         }
     }
-    
-    func createDateTime(unix: Double?) -> String {
+}
+```
+
+Supporting private methods for formatting and text validation of Text Field input.
+
+```Swift    
+extension WeatherViewModel {
+    private func createDateTime(unix: Double?) -> String {
         var strDate = "undefined"
         guard let unix = unix else { return strDate }
         
@@ -327,21 +353,63 @@ extension WeatherViewModel {
         
         return strDate
     }
+    
+    private func isValid(_ num: Int) -> Bool {
+        (3...7).contains(num) ? true : false
+    }
+    
+    private func filterCities(_ cities: String) -> [String] {
+        cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
+    }
 }
 ```
 
+
+
 ### Unit testing
 
-Testing View Model logic.
+Mockable protocol to test network layer with loadJSON function, which reads an internal .json files and converts them into Codable Model.
+
+<img width="300" alt="Screen Shot 2022-06-24 at 8 33 16 PM" src="https://user-images.githubusercontent.com/24648375/175613189-cacb60ab-b040-4232-8135-77204ba514fb.png">
+
 
 ```Swift
-class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
+class WeatherFetchServiceMock: WeatherFetchService, MockableService {
+    func fetchWeather(for cities: [String]) async throws -> [List] {
+        if cities.first == "Foo" {
+            throw NError.unknown
+        }
+        let list: List = loadJSON(filename: "cities")
+        return [list]
+    }
     
-    var viewModel: WeatherViewModel?
+    func fetchWeather(lat: CLLocationDegrees, lon: CLLocationDegrees) async throws -> WeatherData {
+        if lat == 13, lon == 13 {
+            throw NError.invalidData
+        }
+        let data: WeatherData = loadJSON(filename: "location")
+        return data
+    }
+}
+```
+
+
+View Model unit testing with Mock View Model confirming to Weather View Model protocol. 
+
+```Swift
+class OpenWeatherAppTests: XCTestCase {
+    
+    var viewModel: WeatherViewModelProtocol?
+    var list: List {
+        let indexPath = IndexPath(row: 0, section: 0)
+        let listForRow = viewModel?.getListForRow(at: indexPath)
+        return listForRow!
+    }
+    func mockCallback() {}
     
     override func setUp() {
         super.setUp()
-        viewModel = WeatherViewModel()
+        viewModel = WeatherViewModelMock(callback: mockCallback)
     }
     
     override func tearDown() {
@@ -349,39 +417,138 @@ class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
         super.tearDown()
     }
     
-    func testDateTimeCreateWithRandomUnix() throws {
-        let unix = Double.random(in: 300...600)
-        let result = viewModel?.createDateTime(unix: unix)
-        XCTAssertNotNil(result)
-    }
-    
-    func testFetchWeatherWithCities() async throws {
-        let citis = ["Rome", "Toronto", "Byblos"]
-        let list = try await viewModel?.fetchWeather(for: citis)
-        XCTAssertNotNil(list)
-    }
-    
-    func testFetchWeatherFromGeoLocation() async throws {
-        let lon = Double.random(in: 1...50)
-        let lat = Double.random(in: 1...50)
+    func testWeatherFetchServiceMock() async throws {
+        let assertionOne = "San Francisco"
+        let assertionTwo = "Beirut"
+        let serviceMock = WeatherFetchServiceMock()
+        let city: City?
+        let list: [List]
         
-        let data = try await viewModel?.fetchWeather(lat: lat, lon: lon)
-        XCTAssertNotNil(data)
+        do {
+            let weatherData = try await serviceMock.fetchWeather(lat: 0, lon: 0)
+            city = weatherData.city
+            list = try await serviceMock.fetchWeather(for: [])
+        } catch {
+            fatalError(error.localizedDescription)
+        }
+       
+        XCTAssertEqual(city?.name, assertionOne)
+        XCTAssertEqual(list.first?.name, assertionTwo)
     }
     
-    func testGetDescriptionFromList() async throws {
-        let citis = ["Rome", "Toronto", "Byblos"]
-        let list = try await viewModel?.fetchWeather(for: citis)
-        let description = viewModel?.getDescription((list?.first)!)
-        XCTAssertNotNil(description)
+    func testGetGeoWeatherFailure() {
+        let assertion = "Server error, try again later"
+        let expectation = expectation(description: "Fetching failed")
+        var errorText: String?
+        let loc = CLLocation(latitude: 13, longitude: 13)
+        
+        viewModel?.getGeoWeather(loc, failure: { text in
+            errorText = text
+            expectation.fulfill()
+        })
+        
+        waitForExpectations(timeout: 1)
+
+        XCTAssertNotNil(errorText)
+        XCTAssertEqual(errorText, assertion)
     }
     
-    func testGetImageFromList() async throws {
-        let citis = ["Rome", "Toronto", "Byblos"]
-        let list = try await viewModel?.fetchWeather(for: citis)
-        let strImage = viewModel?.getImage((list?.first)!)
-        let image = UIImage(systemName: strImage!)
-        XCTAssertNotNil(image)
+    func testGetCitiesForecastFailure() {
+        let assertion = "Uknown error, try again later"
+        let expectation = expectation(description: "Fetching failed")
+        var errorText: String?
+        
+        viewModel?.getCitiesForecast("Foo", failure: { text in
+                errorText = text
+                expectation.fulfill()
+        })
+        
+        waitForExpectations(timeout: 1)
+        
+        XCTAssertNotNil(errorText)
+        XCTAssertEqual(errorText, assertion)
+    }
+    
+    func testNumberOfRows() {
+        let assertion = 1
+        let rows = viewModel?.numberOfRows()
+        XCTAssertEqual(rows, assertion)
+    }
+    
+    func testGetListForRow() throws {
+        let assertion = "Beirut"
+        let indexPath = IndexPath(row: 0, section: 0)
+        
+        let list = viewModel?.getListForRow(at: indexPath)
+
+        XCTAssertNotNil(list)
+        XCTAssertEqual(list?.name, assertion)
+    }
+    
+    func testGetLabelText() {
+        let assertion = "Jun 24, 2:48 PM"
+        let text = viewModel?.getLabelText(list)
+        XCTAssertEqual(text, assertion)
+    }
+    
+    func testGetHeaderText() {
+        let assertion = "San Francisco"
+        let headerText = viewModel?.getHeaderText()
+        XCTAssertEqual(headerText, assertion)
+    }
+    
+    func testGetDescription() {
+        let assertion = "28 - 33 °C  Few Clouds, wind: 5.66 m/s"
+        let description = viewModel?.getDescription(list)
+        XCTAssertEqual(description, assertion)
+    }
+    
+    func testGetImage() {
+        let assertion = "cloud.sun"
+        let image = viewModel?.getImage(list)
+        XCTAssertEqual(image, assertion)
+    }
+    
+    func testDateTimeCreateWithRandomUnix() {
+        let assertion = "undefined"
+        let mockViewModel = WeatherViewModelMock(callback: mockCallback)
+        let unix = Double.random(in: 300...600)
+        let result = mockViewModel.createDateTime(unix: unix)
+        XCTAssertNotNil(result)
+        XCTAssertNotEqual(result, assertion)
+    }
+    
+    func testIsValidMethod() {
+        let assertionOne = 0
+        let assertionTwo = -3
+        let assertionThree = 4
+        let assertionFour = 9
+        
+        let mockViewModel = WeatherViewModelMock(callback: mockCallback)
+        
+        XCTAssertFalse(mockViewModel.isValid(assertionOne))
+        XCTAssertFalse(mockViewModel.isValid(assertionTwo))
+        XCTAssertTrue(mockViewModel.isValid(assertionThree))
+        XCTAssertFalse(mockViewModel.isValid(assertionFour))
+    }
+    
+    func testFilterCitiesMethod() {
+        let assertionOne = ["FooBarBaz"]
+        let assertionTwo = ["foo", "Bar", "baz"]
+        let assertionThree = ["foOBarr", "Baz"]
+        let assertionFour = ["FOOBarBaz"]
+        
+        let mockOne = "Foo Bar Baz"
+        let mockTwo = "foo, Bar, baz"
+        let mockThree = "foO1. Barr, Baz-2"
+        let mockFour = "FOOBar  Baz"
+        
+        let mockViewModel = WeatherViewModelMock(callback: mockCallback)
+
+        XCTAssertEqual(mockViewModel.filterCities(mockOne), assertionOne)
+        XCTAssertEqual(mockViewModel.filterCities(mockTwo), assertionTwo)
+        XCTAssertEqual(mockViewModel.filterCities(mockThree), assertionThree)
+        XCTAssertEqual(mockViewModel.filterCities(mockFour), assertionFour)
     }
 }
 ```

@@ -7,12 +7,12 @@
 
 import CoreLocation
 
-protocol WeatherService: NetworkService {
+protocol WeatherFetchService: NetworkService {
     func fetchWeather(for cities: [String]) async throws -> [List]
     func fetchWeather(lat: CLLocationDegrees, lon: CLLocationDegrees) async throws -> WeatherData
 }
 
-extension WeatherService {
+extension WeatherFetchService {
     
     private var baseURL: String {
         "https://api.openweathermap.org/data/2.5/weather?units=metric&"
@@ -32,7 +32,7 @@ extension WeatherService {
             async let list: List = fetch(with: stringUrl)
             lists += [try await list]
         }
-        
+        print(lists)
         return lists
     }
     

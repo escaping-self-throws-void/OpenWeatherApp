@@ -7,10 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CF650214285DBC30008BAFE1 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF650213285DBC30008BAFE1 /* WeatherService.swift */; };
+		CF650214285DBC30008BAFE1 /* WeatherFetchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF650213285DBC30008BAFE1 /* WeatherFetchService.swift */; };
 		CF65021C285E4F86008BAFE1 /* NError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF65021B285E4F86008BAFE1 /* NError.swift */; };
 		CF80E564285F9E7100C4CDA4 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = CF80E563285F9E7100C4CDA4 /* RxCocoa */; };
 		CF80E566285F9E7100C4CDA4 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = CF80E565285F9E7100C4CDA4 /* RxSwift */; };
+		CF92D8C22865D22200763507 /* WeatherFetchServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF92D8C12865D22200763507 /* WeatherFetchServiceMock.swift */; };
+		CF92D8C42865D7E600763507 /* cities.json in Resources */ = {isa = PBXBuildFile; fileRef = CF92D8C32865D7E600763507 /* cities.json */; };
+		CF92D8C62865D7F500763507 /* location.json in Resources */ = {isa = PBXBuildFile; fileRef = CF92D8C52865D7F500763507 /* location.json */; };
+		CF92D8CA2865E29000763507 /* WeatherViewModelMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF92D8C92865E29000763507 /* WeatherViewModelMock.swift */; };
+		CFBAC77028660A4000AC71A4 /* MockableService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBAC76F28660A4000AC71A4 /* MockableService.swift */; };
 		CFDF66BA285BA38B001B9A22 /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDF66B9285BA38B001B9A22 /* WeatherViewModel.swift */; };
 		CFDF66BF285CC8AC001B9A22 /* WeatherData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDF66BE285CC8AC001B9A22 /* WeatherData.swift */; };
 		CFFCD6DC285B126100F4B73F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFCD6DB285B126100F4B73F /* AppDelegate.swift */; };
@@ -34,8 +39,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CF650213285DBC30008BAFE1 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		CF650213285DBC30008BAFE1 /* WeatherFetchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherFetchService.swift; sourceTree = "<group>"; };
 		CF65021B285E4F86008BAFE1 /* NError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NError.swift; sourceTree = "<group>"; };
+		CF92D8C12865D22200763507 /* WeatherFetchServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherFetchServiceMock.swift; sourceTree = "<group>"; };
+		CF92D8C32865D7E600763507 /* cities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cities.json; sourceTree = "<group>"; };
+		CF92D8C52865D7F500763507 /* location.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = location.json; sourceTree = "<group>"; };
+		CF92D8C92865E29000763507 /* WeatherViewModelMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModelMock.swift; sourceTree = "<group>"; };
+		CFBAC76F28660A4000AC71A4 /* MockableService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockableService.swift; sourceTree = "<group>"; };
 		CFDF66B9285BA38B001B9A22 /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		CFDF66BE285CC8AC001B9A22 /* WeatherData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherData.swift; sourceTree = "<group>"; };
 		CFFCD6D8285B126100F4B73F /* OpenWeatherApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenWeatherApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,6 +87,16 @@
 				CF65021B285E4F86008BAFE1 /* NError.swift */,
 			);
 			path = Utilities;
+			sourceTree = "<group>";
+		};
+		CFBAC76D2866086900AC71A4 /* Mockable */ = {
+			isa = PBXGroup;
+			children = (
+				CFBAC76F28660A4000AC71A4 /* MockableService.swift */,
+				CF92D8C12865D22200763507 /* WeatherFetchServiceMock.swift */,
+				CF92D8C92865E29000763507 /* WeatherViewModelMock.swift */,
+			);
+			path = Mockable;
 			sourceTree = "<group>";
 		};
 		CFDF66B8285BA326001B9A22 /* Models */ = {
@@ -131,6 +151,9 @@
 			isa = PBXGroup;
 			children = (
 				CFFCD6F2285B126200F4B73F /* WeatherViewModelTests.swift */,
+				CFBAC76D2866086900AC71A4 /* Mockable */,
+				CF92D8C32865D7E600763507 /* cities.json */,
+				CF92D8C52865D7F500763507 /* location.json */,
 			);
 			path = OpenWeatherAppTests;
 			sourceTree = "<group>";
@@ -174,8 +197,8 @@
 			isa = PBXGroup;
 			children = (
 				CF650218285E4F59008BAFE1 /* Utilities */,
-				CF650213285DBC30008BAFE1 /* WeatherService.swift */,
 				CFFCD711285B2A4400F4B73F /* NetworkService.swift */,
+				CF650213285DBC30008BAFE1 /* WeatherFetchService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -278,6 +301,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF92D8C62865D7F500763507 /* location.json in Resources */,
+				CF92D8C42865D7E600763507 /* cities.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,7 +314,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CFDF66BA285BA38B001B9A22 /* WeatherViewModel.swift in Sources */,
-				CF650214285DBC30008BAFE1 /* WeatherService.swift in Sources */,
+				CF650214285DBC30008BAFE1 /* WeatherFetchService.swift in Sources */,
 				CFFCD6E0285B126100F4B73F /* WeatherViewController.swift in Sources */,
 				CFFCD6DC285B126100F4B73F /* AppDelegate.swift in Sources */,
 				CFDF66BF285CC8AC001B9A22 /* WeatherData.swift in Sources */,
@@ -304,6 +329,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				CFFCD6F3285B126200F4B73F /* WeatherViewModelTests.swift in Sources */,
+				CF92D8C22865D22200763507 /* WeatherFetchServiceMock.swift in Sources */,
+				CF92D8CA2865E29000763507 /* WeatherViewModelMock.swift in Sources */,
+				CFBAC77028660A4000AC71A4 /* MockableService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

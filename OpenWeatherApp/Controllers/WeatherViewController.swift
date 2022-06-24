@@ -16,11 +16,14 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var searchTextField: UITextField!
     @IBOutlet weak var geoButton: UIButton!
     
-    private var weatherViewModel: WeatherViewModel!
-    private var bag = DisposeBag()
+    private let locationManager = CLLocationManager()
+    private var weatherViewModel: WeatherViewModelProtocol!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        weatherViewModel = WeatherViewModel(callback: updateUI)
         setupBackgroundImage()
         dismissKeyboardOnTap()
         weatherViewModel = WeatherViewModel()
@@ -30,7 +33,7 @@ class WeatherViewController: UIViewController {
     
     @IBAction func geoButtonPressed() {
         isLoading(true)
-        weatherViewModel.locationManager.requestLocation()
+        locationManager.requestLocation()
     }
 }
 
@@ -75,7 +78,8 @@ extension WeatherViewController: UITextFieldDelegate {
 
 extension WeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        weatherViewModel.getGeoWeather(from: locations.last) { [weak self] errorText in
+        locationManager.stopUpdatingLocation()
+        weatherViewModel.getGeoWeather(locations.last) { [weak self] errorText in
             DispatchQueue.main.async {
                 self?.showAlert(errorText)
             }
