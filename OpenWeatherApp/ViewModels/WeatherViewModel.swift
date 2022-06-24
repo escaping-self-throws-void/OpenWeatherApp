@@ -5,38 +5,52 @@
 //  Created by Paul Matar on 16/06/2022.
 //
 
+import Foundation
 import CoreLocation
 
-final class WeatherViewModel: WeatherService {
+protocol WeatherViewModelProtocol: WeatherFetchService {
+    init(callback: @escaping () -> Void)
     
-    let locationManager = CLLocationManager()
-    var callback: (() -> Void)?
+    func numberOfRows() -> Int
+    func getListForRow(at indexPath: IndexPath) -> List
     
-    private(set) var weatherList: [List] = [] {
+    func getLabelText(_ list: List) -> String?
+    func getDescription(_ list: List) -> String
+    func getImage(_ list: List) -> String
+    func getHeaderText() -> String?
+    
+    func getGeoWeather(_ loc: CLLocation?, failure: @escaping (String) -> Void)
+    func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void)
+}
+
+final class WeatherViewModel: WeatherViewModelProtocol {
+    init(callback: @escaping () -> Void) {
+        self.callback = callback
+    }
+    
+    
+    private var callback: (() -> Void)
+    
+    private var weatherList: [List] = [] {
         didSet {
-            callback?()
+            callback()
         }
     }
-    private(set) var city: City?
-    private(set) var switcher = true
-    
-    init() {
-        locationManager.requestWhenInUseAuthorization()
-    }
+    private var city: City?
+    private var switcher = true
 }
     
 // MARK: - Fetching methods
 
 extension WeatherViewModel {
-    func getGeoWeather(from location: CLLocation?, failure: @escaping (String) -> Void) {
-        guard let location = location else {
+    func getGeoWeather(_ loc: CLLocation?, failure: @escaping (String) -> Void) {
+        guard let location = loc else {
             failure("Can not access location")
             return
         }
         
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
-        locationManager.stopUpdatingLocation()
         
         Task {
             do {
@@ -51,8 +65,8 @@ extension WeatherViewModel {
         switcher = true
     }
     
-    func getCitiesForecast(_ input: String?, failure: @escaping (String) -> Void) {
-        guard let cities = input else { return }
+    func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void) {
+        guard let cities = city else { return }
         let filteredCities = filterCities(cities)
         
         guard isValid(filteredCities.count) else {
@@ -71,12 +85,27 @@ extension WeatherViewModel {
         }
         switcher = false
     }
-    
 }
 
-// MARK: - Processing methods
+// MARK: - TableView methods
 
 extension WeatherViewModel {
+    func numberOfRows() -> Int {
+        weatherList.count
+    }
+    
+    func getListForRow(at indexPath: IndexPath) -> List {
+        weatherList[indexPath.row]
+    }
+    
+    func getLabelText(_ list: List) -> String? {
+        switcher ? createDateTime(unix: list.dt) : list.name
+    }
+    
+    func getHeaderText() -> String? {
+        switcher ? city?.name : createDateTime(unix: weatherList.first?.dt)
+    }
+    
     func getDescription(_ list: List) -> String {
         let minT = String(format: "%1.f", list.main.tempMin)
         let maxT = String(format: "%1.f", list.main.tempMax)
@@ -110,8 +139,12 @@ extension WeatherViewModel {
             return "cloud.sun"
         }
     }
-    
-    func createDateTime(unix: Double?) -> String {
+}
+
+// MARK: - Supporting methods
+
+extension WeatherViewModel {
+    private func createDateTime(unix: Double?) -> String {
         var strDate = "undefined"
         guard let unix = unix else { return strDate }
         
@@ -126,11 +159,7 @@ extension WeatherViewModel {
         
         return strDate
     }
-}
-
-// MARK: - Supporting methods
-
-extension WeatherViewModel {
+    
     private func isValid(_ num: Int) -> Bool {
         (3...7).contains(num) ? true : false
     }

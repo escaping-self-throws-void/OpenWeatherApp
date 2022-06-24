@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CF650214285DBC30008BAFE1 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF650213285DBC30008BAFE1 /* WeatherService.swift */; };
+		CF650214285DBC30008BAFE1 /* WeatherFetchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF650213285DBC30008BAFE1 /* WeatherFetchService.swift */; };
 		CF65021C285E4F86008BAFE1 /* NError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF65021B285E4F86008BAFE1 /* NError.swift */; };
 		CFDF66BA285BA38B001B9A22 /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDF66B9285BA38B001B9A22 /* WeatherViewModel.swift */; };
 		CFDF66BF285CC8AC001B9A22 /* WeatherData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDF66BE285CC8AC001B9A22 /* WeatherData.swift */; };
@@ -32,7 +32,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CF650213285DBC30008BAFE1 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		CF650213285DBC30008BAFE1 /* WeatherFetchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherFetchService.swift; sourceTree = "<group>"; };
 		CF65021B285E4F86008BAFE1 /* NError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NError.swift; sourceTree = "<group>"; };
 		CFDF66B9285BA38B001B9A22 /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		CFDF66BE285CC8AC001B9A22 /* WeatherData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherData.swift; sourceTree = "<group>"; };
@@ -170,7 +170,7 @@
 			isa = PBXGroup;
 			children = (
 				CF650218285E4F59008BAFE1 /* Utilities */,
-				CF650213285DBC30008BAFE1 /* WeatherService.swift */,
+				CF650213285DBC30008BAFE1 /* WeatherFetchService.swift */,
 				CFFCD711285B2A4400F4B73F /* NetworkService.swift */,
 			);
 			path = Services;
@@ -278,7 +278,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CFDF66BA285BA38B001B9A22 /* WeatherViewModel.swift in Sources */,
-				CF650214285DBC30008BAFE1 /* WeatherService.swift in Sources */,
+				CF650214285DBC30008BAFE1 /* WeatherFetchService.swift in Sources */,
 				CFFCD6E0285B126100F4B73F /* WeatherViewController.swift in Sources */,
 				CFFCD6DC285B126100F4B73F /* AppDelegate.swift in Sources */,
 				CFDF66BF285CC8AC001B9A22 /* WeatherData.swift in Sources */,

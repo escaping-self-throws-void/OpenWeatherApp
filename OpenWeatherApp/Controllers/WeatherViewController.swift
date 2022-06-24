@@ -14,23 +14,21 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var searchTextField: UITextField!
     @IBOutlet weak var geoButton: UIButton!
     
-    private var weatherViewModel: WeatherViewModel! {
-        didSet {
-            weatherViewModel.callback = updateUI
-            weatherViewModel.locationManager.delegate = self
-        }
-    }
+    private let locationManager = CLLocationManager()
+    private var weatherViewModel: WeatherViewModelProtocol!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        weatherViewModel = WeatherViewModel(callback: updateUI)
         setupBackgroundImage()
         dismissKeyboardOnTap()
-        weatherViewModel = WeatherViewModel()
     }
     
     @IBAction func geoButtonPressed() {
         isLoading(true)
-        weatherViewModel.locationManager.requestLocation()
+        locationManager.requestLocation()
     }
 }
 
@@ -38,15 +36,15 @@ class WeatherViewController: UIViewController {
 
 extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        weatherViewModel.weatherList.count
+        weatherViewModel.numberOfRows()
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell", for: indexPath)
-        let list = weatherViewModel.weatherList[indexPath.row]
+        let list = weatherViewModel.getListForRow(at: indexPath)
         
         var content = cell.defaultContentConfiguration()
-        content.text = weatherViewModel.switcher ? weatherViewModel.createDateTime(unix: list.dt) : list.name
+        content.text = weatherViewModel.getLabelText(list)
         content.secondaryText = weatherViewModel.getDescription(list)
         content.secondaryTextProperties.font = .systemFont(ofSize: 12, weight: .medium)
         content.image = UIImage(systemName: weatherViewModel.getImage(list))
@@ -60,9 +58,7 @@ extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
         let headerView = UITableViewHeaderFooterView()
         var content = headerView.defaultContentConfiguration()
         
-        content.text = weatherViewModel.switcher
-            ? weatherViewModel.city?.name
-            : weatherViewModel.createDateTime(unix: weatherViewModel.weatherList.first?.dt)
+        content.text = weatherViewModel.getHeaderText()
         content.textProperties.font = .boldSystemFont(ofSize: 16)
         content.textProperties.color = .label
         
@@ -91,7 +87,8 @@ extension WeatherViewController: UITextFieldDelegate {
 
 extension WeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        weatherViewModel.getGeoWeather(from: locations.last) { [weak self] errorText in
+        locationManager.stopUpdatingLocation()
+        weatherViewModel.getGeoWeather(locations.last) { [weak self] errorText in
             DispatchQueue.main.async {
                 self?.showAlert(errorText)
             }
