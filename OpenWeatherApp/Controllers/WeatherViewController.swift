@@ -18,16 +18,15 @@ class WeatherViewController: UIViewController {
     
     private let locationManager = CLLocationManager()
     private var weatherViewModel: WeatherViewModelProtocol!
+    private let bag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
-        weatherViewModel = WeatherViewModel(callback: updateUI)
+        weatherViewModel = WeatherViewModel()
         setupBackgroundImage()
         dismissKeyboardOnTap()
-        weatherViewModel = WeatherViewModel()
-        weatherViewModel.locationManager.delegate = self
         bindTableView()
     }
     
@@ -42,13 +41,14 @@ class WeatherViewController: UIViewController {
 extension WeatherViewController {
     
     private func bindTableView() {
-        weatherViewModel.weatherList.bind(to: weatherTableView.rx.items(cellIdentifier: "WeatherCell", cellType: UITableViewCell.self)) { row, model, cell in
+        weatherViewModel.weatherList.bind(to: weatherTableView.rx.items(cellIdentifier: "WeatherCell", cellType: UITableViewCell.self)) { [weak self] row, model, cell in
             var content = cell.defaultContentConfiguration()
-            let name = model.name != nil ? model.name : self.weatherViewModel.city?.name
-            content.text = "\(self.weatherViewModel.createDateTime(unix: model.dt)) - \(name ?? "undefined")"
-            content.secondaryText = self.weatherViewModel.getDescription(model)
+            
+            content.text = self?.weatherViewModel.getLabelText(model)
+            content.secondaryText = self?.weatherViewModel.getDescription(model)
             content.secondaryTextProperties.font = .systemFont(ofSize: 12, weight: .medium)
-            content.image = UIImage(systemName: self.weatherViewModel.getImage(model))
+            let image = self?.weatherViewModel.getImage(model)
+            content.image = UIImage(systemName: image ?? "cloud.sun")
             cell.contentConfiguration = content
             cell.backgroundColor = .clear
         }.disposed(by: bag)

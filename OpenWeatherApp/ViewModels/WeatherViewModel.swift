@@ -11,34 +11,21 @@ import RxCocoa
 import RxSwift
 
 protocol WeatherViewModelProtocol: WeatherFetchService {
-    init(callback: @escaping () -> Void)
-    
-    func numberOfRows() -> Int
-    func getListForRow(at indexPath: IndexPath) -> List
+    var weatherList: BehaviorRelay<[List]> { get }
     
     func getLabelText(_ list: List) -> String?
     func getDescription(_ list: List) -> String
     func getImage(_ list: List) -> String
-    func getHeaderText() -> String?
     
     func getGeoWeather(_ loc: CLLocation?, failure: @escaping (String) -> Void)
     func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void)
 }
 
 final class WeatherViewModel: WeatherViewModelProtocol {
-    init(callback: @escaping () -> Void) {
-        self.callback = callback
-    }
-    
-    private var callback: (() -> Void)
-    
-    private var weatherList: [List] = [] {
-        didSet {
-            callback()
-        }
-    }
+ 
+    var weatherList: BehaviorRelay<[List]> = BehaviorRelay(value: [])
+
     private var city: City?
-    private var switcher = true
 }
     
 // MARK: - Fetching methods
@@ -89,20 +76,10 @@ extension WeatherViewModel {
 // MARK: - TableView methods
 
 extension WeatherViewModel {
-    func numberOfRows() -> Int {
-        weatherList.count
-    }
-    
-    func getListForRow(at indexPath: IndexPath) -> List {
-        weatherList[indexPath.row]
-    }
     
     func getLabelText(_ list: List) -> String? {
-        switcher ? createDateTime(unix: list.dt) : list.name
-    }
-    
-    func getHeaderText() -> String? {
-        switcher ? city?.name : createDateTime(unix: weatherList.first?.dt)
+        let name = list.name != nil ? list.name : city?.name
+        return "\(createDateTime(unix: list.dt)) - \(name ?? "undefined")"
     }
     
     func getDescription(_ list: List) -> String {
