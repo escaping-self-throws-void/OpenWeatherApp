@@ -1,47 +1,31 @@
 //
-//  WeatherViewModel.swift
-//  OpenWeatherApp
+//  WeatherViewModelMock.swift
+//  OpenWeatherAppTests
 //
-//  Created by Paul Matar on 16/06/2022.
+//  Created by Paul Matar on 24/06/2022.
 //
 
-import Foundation
 import CoreLocation
+@testable import OpenWeatherApp
 
-protocol WeatherViewModelProtocol: WeatherFetchService {
-    init(callback: @escaping () -> Void)
+final class WeatherViewModelMock: WeatherFetchServiceMock, WeatherViewModelProtocol {
     
-    func numberOfRows() -> Int
-    func getListForRow(at indexPath: IndexPath) -> List
-    
-    func getLabelText(_ list: List) -> String?
-    func getDescription(_ list: List) -> String
-    func getImage(_ list: List) -> String
-    func getHeaderText() -> String?
-    
-    func getGeoWeather(_ loc: CLLocation?, failure: @escaping (String) -> Void)
-    func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void)
-}
-
-final class WeatherViewModel: WeatherViewModelProtocol {
-    init(callback: @escaping () -> Void) {
-        self.callback = callback
+    init(callback: @escaping () -> Void) {}
+        
+    private var weatherList: [List] {
+        let list: List = loadJSON(filename: "cities")
+        return [list]
     }
-    
-    private var callback: (() -> Void)
-    
-    private var weatherList: [List] = [] {
-        didSet {
-            callback()
-        }
+    private var city: City? {
+        let data: WeatherData = loadJSON(filename: "location")
+        return data.city
     }
-    private var city: City?
     private var switcher = true
 }
     
 // MARK: - Fetching methods
 
-extension WeatherViewModel {
+extension WeatherViewModelMock {
     func getGeoWeather(_ loc: CLLocation?, failure: @escaping (String) -> Void) {
         guard let location = loc else {
             failure("Can not access location")
@@ -53,9 +37,7 @@ extension WeatherViewModel {
         
         Task {
             do {
-                let weather = try await fetchWeather(lat: lat, lon: lon)
-                city = weather.city
-                weatherList = weather.list
+                let _ = try await fetchWeather(lat: lat, lon: lon)
             } catch {
                 print(error)
                 failure(error.localizedDescription)
@@ -65,18 +47,11 @@ extension WeatherViewModel {
     }
     
     func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void) {
-        guard let cities = city else { return }
-        let filteredCities = filterCities(cities)
-        
-        guard isValid(filteredCities.count) else {
-            failure("Please enter minimum 3 and max 7 cities")
-            return
-        }
+        let filteredCities = [city!]
         
         Task {
             do {
-                let list = try await fetchWeather(for: filteredCities)
-                weatherList = list
+                let _ = try await fetchWeather(for: filteredCities)
             } catch {
                 print(error)
                 failure(error.localizedDescription)
@@ -88,7 +63,7 @@ extension WeatherViewModel {
 
 // MARK: - TableView methods
 
-extension WeatherViewModel {
+extension WeatherViewModelMock {
     func numberOfRows() -> Int {
         weatherList.count
     }
@@ -142,8 +117,8 @@ extension WeatherViewModel {
 
 // MARK: - Supporting methods
 
-extension WeatherViewModel {
-    private func createDateTime(unix: Double?) -> String {
+extension WeatherViewModelMock {
+    func createDateTime(unix: Double?) -> String {
         var strDate = "undefined"
         guard let unix = unix else { return strDate }
         
@@ -159,11 +134,11 @@ extension WeatherViewModel {
         return strDate
     }
     
-    private func isValid(_ num: Int) -> Bool {
+    func isValid(_ num: Int) -> Bool {
         (3...7).contains(num) ? true : false
     }
     
-    private func filterCities(_ cities: String) -> [String] {
+    func filterCities(_ cities: String) -> [String] {
         cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
     }
 }

@@ -32,7 +32,7 @@ extension WeatherFetchService {
             async let list: List = fetch(with: stringUrl)
             lists += [try await list]
         }
-        
+        print(lists)
         return lists
     }
     
