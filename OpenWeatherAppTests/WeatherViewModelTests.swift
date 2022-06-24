@@ -9,15 +9,15 @@ import XCTest
 import CoreLocation
 @testable import OpenWeatherApp
 
-class OpenWeatherAppTests: XCTestCase, CLLocationManagerDelegate {
+class OpenWeatherAppTests: XCTestCase {
     
     var viewModel: WeatherViewModelProtocol?
-    func mockCallback() {}
     var list: List {
         let indexPath = IndexPath(row: 0, section: 0)
         let listForRow = viewModel?.getListForRow(at: indexPath)
         return listForRow!
     }
+    func mockCallback() {}
     
     
     override func setUp() {
