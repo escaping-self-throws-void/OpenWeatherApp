@@ -15,7 +15,7 @@ protocol WeatherPresentationLogic {
     func presentData(response: WeatherResponse)
 }
 
-class WeatherPresenter: WeatherPresentationLogic {
+final class WeatherPresenter: WeatherPresentationLogic {
     
     weak var viewController: WeatherDisplayLogic?
     

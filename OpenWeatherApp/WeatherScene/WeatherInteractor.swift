@@ -21,7 +21,7 @@ protocol WeatherDataStore {
     var error: String? { get }
 }
 
-class WeatherInteractor: WeatherBusinessLogic, WeatherDataStore {
+final class WeatherInteractor: WeatherBusinessLogic, WeatherDataStore {
     var weatherList: [List] = []
     var city: City?
     var error: String?
