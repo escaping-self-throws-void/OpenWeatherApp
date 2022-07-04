@@ -9,11 +9,10 @@
 //  you can apply clean architecture to your iOS and Mac projects,
 //  see http://clean-swift.com
 //
-
-import UIKit
+import Foundation
 
 protocol WeatherBusinessLogic {
-    func fetchFromGeo(request: WeatherGeoRequest)
+    func fetchFrom(request: WeatherRequest)
 }
 
 protocol WeatherDataStore {
@@ -23,14 +22,13 @@ protocol WeatherDataStore {
 }
 
 class WeatherInteractor: WeatherBusinessLogic, WeatherDataStore {
-    
     var weatherList: [List] = []
     var city: City?
     var error: String?
     
     var presenter: WeatherPresentationLogic?
     
-    func fetchFromGeo(request: WeatherGeoRequest) {
+    func fetchFrom(request: WeatherRequest) {
         if let lat = request.lat, let lon = request.lon {
             presentGeo(lat: lat, lon: lon)
         } else if let cities = request.cities {
@@ -39,11 +37,7 @@ class WeatherInteractor: WeatherBusinessLogic, WeatherDataStore {
     }
 }
 
-
-
-
-
-// MARK: - Present methods
+// MARK: - Presenting methods
 
 extension WeatherInteractor {
     private func presentGeo(lat: Double, lon: Double) {
@@ -57,8 +51,8 @@ extension WeatherInteractor {
                 error = err.localizedDescription
             }
             
-            let response = WeatherGeoResponse(city: city, weatherList: weatherList, error: error)
-            presenter?.presentGeoData(response: response)
+            let response = WeatherResponse(city: city, weatherList: weatherList, error: error)
+            presenter?.presentData(response: response)
         }
     }
     
@@ -78,8 +72,8 @@ extension WeatherInteractor {
                 self.error = error.localizedDescription
             }
             
-            let response = WeatherGeoResponse(weatherList: weatherList, error: error)
-            presenter?.presentGeoData(response: response)
+            let response = WeatherResponse(weatherList: weatherList, error: error)
+            presenter?.presentData(response: response)
         }
     }
 }

@@ -9,7 +9,7 @@ import UIKit
 import CoreLocation
 
 protocol WeatherDisplayLogic: AnyObject {
-    func displayGeoWeather(viewModel: WeatherGeoViewModel)
+    func displayWeather(viewModel: WeatherViewModel)
 }
 
 class WeatherViewController: UIViewController {
@@ -21,7 +21,7 @@ class WeatherViewController: UIViewController {
     var interactor: WeatherBusinessLogic?
     
     private let locationManager = CLLocationManager()
-    private var weatherViewModel: WeatherGeoViewModel? {
+    private var weatherViewModel: WeatherViewModel? {
         didSet {
             updateUI()
             showError()
@@ -94,11 +94,6 @@ extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension WeatherViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-//        weatherViewModel.getCitiesForecast(searchTextField.text) { [weak self] errorText in
-//            DispatchQueue.main.async {
-//                self?.showAlert(errorText)
-//            }
-//        }
         getCityWeatherList(searchTextField.text)
         searchTextField.resignFirstResponder()
         return true
@@ -202,19 +197,18 @@ extension WeatherViewController {
     }
     
     private func getGeoWeatherList(_ lat: Double, lon: Double) {
-        let request = WeatherGeoRequest(lat: lat, lon: lon)
-        interactor?.fetchFromGeo(request: request)
+        let request = WeatherRequest(lat: lat, lon: lon)
+        interactor?.fetchFrom(request: request)
     }
     
     private func getCityWeatherList(_ cities: String?) {
-        let request = WeatherGeoRequest(cities: cities)
-        interactor?.fetchFromGeo(request: request)
+        let request = WeatherRequest(cities: cities)
+        interactor?.fetchFrom(request: request)
     }
-    
 }
 
 extension WeatherViewController: WeatherDisplayLogic {
-    func displayGeoWeather(viewModel: WeatherGeoViewModel) {
+    func displayWeather(viewModel: WeatherViewModel) {
         weatherViewModel = viewModel
     }
 }

@@ -12,34 +12,34 @@
 import Foundation
 
 protocol WeatherPresentationLogic {
-    func presentGeoData(response: WeatherGeoResponse)
+    func presentData(response: WeatherResponse)
 }
 
 class WeatherPresenter: WeatherPresentationLogic {
     
     weak var viewController: WeatherDisplayLogic?
     
-    func presentGeoData(response: WeatherGeoResponse) {
+    func presentData(response: WeatherResponse) {
         let switcher = response.city != nil
         let headerText = switcher ? response.city?.name : createDateTime(unix: response.weatherList.first?.dt)
         let error = response.error
         
-        var cells = [WeatherGeoCell]()
+        var cells = [WeatherCell]()
         
         response.weatherList.forEach { list in
             let label = switcher ? createDateTime(unix: list.dt) : list.name
             let description = getDescription(list)
             let image = getImage(list)
-            let cell = WeatherGeoCell(labelText: label,
+            let cell = WeatherCell(labelText: label,
                                       description: description,
                                       image: image)
             cells.append(cell)
         }
         
-        let viewModel = WeatherGeoViewModel(cells: cells,
+        let viewModel = WeatherViewModel(cells: cells,
                                             headerText: headerText,
                                             error: error)
-        viewController?.displayGeoWeather(viewModel: viewModel)
+        viewController?.displayWeather(viewModel: viewModel)
     }
     
     

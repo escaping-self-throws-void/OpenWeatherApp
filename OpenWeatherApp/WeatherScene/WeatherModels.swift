@@ -11,15 +11,14 @@
 //
 import Foundation
 
-typealias WeatherGeoViewModel = WeatherType.GeoWeather.ViewModel
-typealias WeatherGeoRequest = WeatherType.GeoWeather.Request
-typealias WeatherGeoResponse = WeatherType.GeoWeather.Response
-typealias WeatherGeoCell = WeatherType.GeoWeather.ViewModel.CellViewModel
+typealias WeatherViewModel = WeatherType.WeatherTask.ViewModel
+typealias WeatherRequest = WeatherType.WeatherTask.Request
+typealias WeatherResponse = WeatherType.WeatherTask.Response
+typealias WeatherCell = WeatherType.WeatherTask.ViewModel.CellViewModel
 
 enum WeatherType {
     
-    // Geo button use case
-    enum GeoWeather {
+    enum WeatherTask {
         struct Request {
             var lat: Double? = nil
             var lon: Double? = nil
