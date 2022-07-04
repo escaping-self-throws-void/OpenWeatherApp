@@ -8,7 +8,9 @@
 import Foundation
 import CoreLocation
 
-protocol WeatherViewModelProtocol: WeatherFetchService {
+/*
+
+protocol WeatherViewModelProtocol: WeatherCoordinator {
     init(callback: @escaping () -> Void)
     
     func numberOfRows() -> Int
@@ -167,3 +169,4 @@ extension WeatherViewModel {
         cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
     }
 }
+*/
