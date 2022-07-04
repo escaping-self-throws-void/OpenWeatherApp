@@ -61,6 +61,8 @@ extension WeatherInteractor {
         
         guard isValid(filteredCities.count) else {
             error = "Please enter minimum 3 and max 7 cities"
+            let response = WeatherResponse(weatherList: weatherList, error: error)
+            presenter?.presentData(response: response)
             return
         }
         
