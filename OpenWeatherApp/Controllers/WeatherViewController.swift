@@ -41,7 +41,8 @@ class WeatherViewController: UIViewController {
 extension WeatherViewController {
     
     private func bindTableView() {
-        weatherViewModel.weatherList.bind(to: weatherTableView.rx.items(cellIdentifier: "WeatherCell", cellType: UITableViewCell.self)) { [weak self] row, model, cell in
+        weatherViewModel.weatherList
+            .bind(to: weatherTableView.rx.items(cellIdentifier: "WeatherCell", cellType: UITableViewCell.self)) { [weak self] row, model, cell in
             var content = cell.defaultContentConfiguration()
             
             content.text = self?.weatherViewModel.getLabelText(model)

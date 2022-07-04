@@ -23,7 +23,7 @@ protocol WeatherViewModelProtocol: WeatherFetchService {
 
 final class WeatherViewModel: WeatherViewModelProtocol {
  
-    var weatherList: BehaviorRelay<[List]> = BehaviorRelay(value: [])
+    var weatherList = BehaviorRelay<[List]>(value: [])
 
     private var city: City?
 }
