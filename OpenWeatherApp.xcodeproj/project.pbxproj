@@ -87,7 +87,6 @@
 			isa = PBXGroup;
 			children = (
 				CFDF66BB285CAFC6001B9A22 /* ViewModels */,
-				CFFCD70B285B12A900F4B73F /* Controllers */,
 			);
 			path = MVVM;
 			sourceTree = "<group>";
@@ -162,10 +161,10 @@
 				CFFCD70F285B1A6200F4B73F /* SupportingFiles */,
 				CFFCD70C285B12B300F4B73F /* Resources */,
 				CFFCD710285B1A7E00F4B73F /* Storyboard */,
+				CFDF66B8285BA326001B9A22 /* Models */,
 				CF0A78AD2872BD15002A6106 /* MVVM */,
 				CF0A78AE2872BD4A002A6106 /* WeatherScene */,
 				CFFCD713285B2A5000F4B73F /* Services */,
-				CFDF66B8285BA326001B9A22 /* Models */,
 			);
 			path = OpenWeatherApp;
 			sourceTree = "<group>";
@@ -179,13 +178,6 @@
 				CF92D8C52865D7F500763507 /* location.json */,
 			);
 			path = OpenWeatherAppTests;
-			sourceTree = "<group>";
-		};
-		CFFCD70B285B12A900F4B73F /* Controllers */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Controllers;
 			sourceTree = "<group>";
 		};
 		CFFCD70C285B12B300F4B73F /* Resources */ = {

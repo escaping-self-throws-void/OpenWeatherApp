@@ -9,7 +9,7 @@ import UIKit
 import CoreLocation
 
 protocol WeatherDisplayLogic: AnyObject {
-    func displayGeoWeather(viewModel: WeatherType.GeoWeather.ViewModel)
+    func displayGeoWeather(viewModel: WeatherGeoViewModel)
 }
 
 class WeatherViewController: UIViewController {
@@ -21,7 +21,7 @@ class WeatherViewController: UIViewController {
     var interactor: WeatherBusinessLogic?
     
     private let locationManager = CLLocationManager()
-    private var weatherViewModel: WeatherViewModel? {
+    private var weatherViewModel: WeatherGeoViewModel? {
         didSet {
             updateUI()
             showError()
@@ -99,6 +99,7 @@ extension WeatherViewController: UITextFieldDelegate {
 //                self?.showAlert(errorText)
 //            }
 //        }
+        getCityWeatherList(searchTextField.text)
         searchTextField.resignFirstResponder()
         return true
     }
@@ -201,14 +202,19 @@ extension WeatherViewController {
     }
     
     private func getGeoWeatherList(_ lat: Double, lon: Double) {
-        let request = WeatherRequest(lat: lat, lon: lon)
-        interactor?.fetchData(request: request)
+        let request = WeatherGeoRequest(lat: lat, lon: lon)
+        interactor?.fetchFromGeo(request: request)
+    }
+    
+    private func getCityWeatherList(_ cities: String?) {
+        let request = WeatherGeoRequest(cities: cities)
+        interactor?.fetchFromGeo(request: request)
     }
     
 }
 
 extension WeatherViewController: WeatherDisplayLogic {
-    func displayGeoWeather(viewModel: WeatherViewModel) {
+    func displayGeoWeather(viewModel: WeatherGeoViewModel) {
         weatherViewModel = viewModel
     }
 }

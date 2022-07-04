@@ -11,32 +11,35 @@
 //
 import Foundation
 
-typealias WeatherViewModel = WeatherType.GeoWeather.ViewModel
-typealias WeatherRequest = WeatherType.GeoWeather.Request
-typealias WeatherResponse = WeatherType.GeoWeather.Response
-typealias WeatherCell = WeatherType.GeoWeather.ViewModel.CellViewModel
+typealias WeatherGeoViewModel = WeatherType.GeoWeather.ViewModel
+typealias WeatherGeoRequest = WeatherType.GeoWeather.Request
+typealias WeatherGeoResponse = WeatherType.GeoWeather.Response
+typealias WeatherGeoCell = WeatherType.GeoWeather.ViewModel.CellViewModel
 
 enum WeatherType {
     
+    // Geo button use case
     enum GeoWeather {
         struct Request {
-            let lat, lon: Double
+            var lat: Double? = nil
+            var lon: Double? = nil
+            var cities: String? = nil
         }
         
         struct Response {
+            var city: City? = nil
             let weatherList: [List]
-            let city: City?
-            let error: Error?
+            let error: String?
         }
         
         struct ViewModel {
             struct CellViewModel {
-                let labelText: String
+                let labelText: String?
                 let description: String
                 let image: String
             }
             
-            let cells: [WeatherCell]
+            let cells: [CellViewModel]
             let headerText: String?
             let error: String?
         }

@@ -12,58 +12,40 @@
 import Foundation
 
 protocol WeatherPresentationLogic {
-    func presentData(response: WeatherResponse)
+    func presentGeoData(response: WeatherGeoResponse)
 }
 
 class WeatherPresenter: WeatherPresentationLogic {
     
     weak var viewController: WeatherDisplayLogic?
     
-    func presentData(response: WeatherResponse) {
-        let headerText = response.city?.name
-        let error = response.error?.localizedDescription
+    func presentGeoData(response: WeatherGeoResponse) {
+        let switcher = response.city != nil
+        let headerText = switcher ? response.city?.name : createDateTime(unix: response.weatherList.first?.dt)
+        let error = response.error
         
-        var cells = [WeatherCell]()
+        var cells = [WeatherGeoCell]()
         
         response.weatherList.forEach { list in
-            let label = createDateTime(unix: list.dt)
+            let label = switcher ? createDateTime(unix: list.dt) : list.name
             let description = getDescription(list)
             let image = getImage(list)
-            let cell = WeatherViewModel.CellViewModel(labelText: label,
-                                           description: description,
-                                           image: image)
+            let cell = WeatherGeoCell(labelText: label,
+                                      description: description,
+                                      image: image)
             cells.append(cell)
         }
         
-        let viewModel = WeatherViewModel(cells: cells,
-                                         headerText: headerText,
-                                         error: error)
+        let viewModel = WeatherGeoViewModel(cells: cells,
+                                            headerText: headerText,
+                                            error: error)
         viewController?.displayGeoWeather(viewModel: viewModel)
     }
+    
+    
 }
 
-/*
- 
- func numberOfRows() -> Int {
-     weatherList.count
- }
-
- func getListForRow(at indexPath: IndexPath) -> List {
-     weatherList[indexPath.row]
- }
-
- func getLabelText(_ list: List) -> String? {
-     switcher ? createDateTime(unix: list.dt) : list.name
- }
-
- func getHeaderText() -> String? {
-     switcher ? city?.name : createDateTime(unix: weatherList.first?.dt)
- }
-
- }
- */
-
- // MARK: - Supporting methods
+// MARK: - Supporting methods
 
 extension WeatherPresenter {
     private func getDescription(_ list: List) -> String {
@@ -99,7 +81,7 @@ extension WeatherPresenter {
             return "cloud.sun"
         }
     }
-        
+    
     private func createDateTime(unix: Double?) -> String {
         var strDate = "undefined"
         guard let unix = unix else { return strDate }
@@ -115,13 +97,5 @@ extension WeatherPresenter {
         
         return strDate
     }
-    
-    private func isValid(_ num: Int) -> Bool {
-        (3...7).contains(num) ? true : false
-    }
-    
-    private func filterCities(_ cities: String) -> [String] {
-        cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
-    }
 }
- 
+
