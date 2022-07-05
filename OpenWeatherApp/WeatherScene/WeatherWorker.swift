@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class WeatherCoordinator: NetworkService {
+final class WeatherWorker: NetworkService {
     
-    static let shared = WeatherCoordinator()
+    static let shared = WeatherWorker()
     
     private var baseURL: String {
         "https://api.openweathermap.org/data/2.5/weather?units=metric&"

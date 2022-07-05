@@ -43,7 +43,7 @@ extension WeatherInteractor {
     private func presentGeo(lat: Double, lon: Double) {
         Task {
             do {
-                let fetchedData = try await WeatherCoordinator.shared
+                let fetchedData = try await WeatherWorker.shared
                     .fetchWeather(lat: lat, lon: lon)
                 city = fetchedData.city
                 weatherList = fetchedData.list
@@ -68,7 +68,7 @@ extension WeatherInteractor {
         
         Task {
             do {
-                let list = try await WeatherCoordinator.shared.fetchWeather(for: filteredCities)
+                let list = try await WeatherWorker.shared.fetchWeather(for: filteredCities)
                 weatherList = list
             } catch {
                 self.error = error.localizedDescription

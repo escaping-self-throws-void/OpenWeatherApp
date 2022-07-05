@@ -8,7 +8,7 @@
 import CoreLocation
 @testable import OpenWeatherApp
 
-class WeatherFetchServiceMock: WeatherCoordinator, MockableService {
+class WeatherFetchServiceMock: WeatherWorker, MockableService {
     func fetchWeather(for cities: [String]) async throws -> [List] {
         if cities.first == "Foo" {
             throw NError.unknown
