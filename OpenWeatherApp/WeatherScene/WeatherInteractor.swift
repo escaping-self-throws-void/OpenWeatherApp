@@ -30,9 +30,9 @@ final class WeatherInteractor: WeatherBusinessLogic, WeatherDataStore {
     
     func getData(from request: WeatherRequest) {
         if let lat = request.lat, let lon = request.lon {
-            presentGeo(lat: lat, lon: lon)
+            provideGeoWeather(lat: lat, lon: lon)
         } else if let cities = request.cities {
-            presentCity(with: cities)
+            provideCityWeather(with: cities)
         }
     }
 }
@@ -40,7 +40,7 @@ final class WeatherInteractor: WeatherBusinessLogic, WeatherDataStore {
 // MARK: - Presenting methods
 
 extension WeatherInteractor {
-    private func presentGeo(lat: Double, lon: Double) {
+    private func provideGeoWeather(lat: Double, lon: Double) {
         Task {
             do {
                 let fetchedData = try await WeatherWorker.shared
@@ -56,7 +56,7 @@ extension WeatherInteractor {
         }
     }
     
-    private func presentCity(with cities: String) {
+    private func provideCityWeather(with cities: String) {
         let filteredCities = filterCities(cities)
         
         guard isValid(filteredCities.count) else {
