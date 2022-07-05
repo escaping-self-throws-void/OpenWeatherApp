@@ -12,7 +12,7 @@
 import Foundation
 
 protocol WeatherBusinessLogic {
-    func fetchFrom(request: WeatherRequest)
+    func getData(from request: WeatherRequest)
 }
 
 protocol WeatherDataStore {
@@ -28,7 +28,7 @@ final class WeatherInteractor: WeatherBusinessLogic, WeatherDataStore {
     
     var presenter: WeatherPresentationLogic?
     
-    func fetchFrom(request: WeatherRequest) {
+    func getData(from request: WeatherRequest) {
         if let lat = request.lat, let lon = request.lon {
             presentGeo(lat: lat, lon: lon)
         } else if let cities = request.cities {

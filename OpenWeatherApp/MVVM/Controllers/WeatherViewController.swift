@@ -198,12 +198,12 @@ extension WeatherViewController {
     
     private func getGeoWeatherList(_ lat: Double, lon: Double) {
         let request = WeatherRequest(lat: lat, lon: lon)
-        interactor?.fetchFrom(request: request)
+        interactor?.getData(from: request)
     }
     
     private func getCityWeatherList(_ cities: String?) {
         let request = WeatherRequest(cities: cities)
-        interactor?.fetchFrom(request: request)
+        interactor?.getData(from: request)
     }
 }
 
