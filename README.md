@@ -40,6 +40,7 @@ Small app to fetch the weather forecast of multiple cities.
 ### Design Pattern
 
 * MVVM 
+* CleanSwift (other branch)
 
 ### Concepts
 
@@ -48,7 +49,7 @@ Small app to fetch the weather forecast of multiple cities.
 
 ### Dependencies
 
-* RxSwift (on test branch)
+* RxSwift (other branch)
 
 ## In-depth 
 
