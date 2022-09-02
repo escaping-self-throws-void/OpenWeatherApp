@@ -45,7 +45,9 @@ Small app to fetch the weather forecast of multiple cities.
 ### Concepts
 
 * SOLID
-* Object-oriented programming
+* OOP
+* POP
+* Dependency injection
 
 ### Dependencies
 
