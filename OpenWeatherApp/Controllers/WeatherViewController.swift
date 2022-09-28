@@ -8,27 +8,60 @@
 import UIKit
 import CoreLocation
 
-class WeatherViewController: UIViewController {
+final class WeatherViewController: UIViewController {
     
-    @IBOutlet weak var weatherTableView: UITableView!
-    @IBOutlet weak var searchTextField: UITextField!
-    @IBOutlet weak var geoButton: UIButton!
+    private lazy var weatherTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.backgroundColor = .clear
+        tableView.allowsSelection = false
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        return tableView
+    }()
+    
+    private lazy var searchTextField: UITextField = {
+        let textField = UITextField()
+        textField.borderStyle = .roundedRect
+        textField.placeholder = "Enter min 3 and max 7 cities"
+        textField.backgroundColor = .clear
+        textField.delegate = self
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    private lazy var geoButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "location"), for: .normal)
+        button.tintColor = .systemPurple
+        button.addTarget(self, action: #selector(geoButtonPressed), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [geoButton, searchTextField])
+        stackView.axis = .horizontal
+        stackView.alignment = .fill
+        stackView.distribution = .fill
+        stackView.spacing = 5
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
     
     private let locationManager = CLLocationManager()
     private var weatherViewModel: WeatherViewModelProtocol!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupBackgroundImage()
+        setupUI()
+        setupConstraints()
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         weatherViewModel = WeatherViewModel(callback: updateUI)
-        setupBackgroundImage()
         dismissKeyboardOnTap()
-    }
-    
-    @IBAction func geoButtonPressed() {
-        isLoading(true)
-        locationManager.requestLocation()
     }
 }
 
@@ -40,7 +73,7 @@ extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         let list = weatherViewModel.getListForRow(at: indexPath)
         
         var content = cell.defaultContentConfiguration()
@@ -50,6 +83,8 @@ extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
         content.image = UIImage(systemName: weatherViewModel.getImage(list))
         cell.contentConfiguration = content
         cell.backgroundColor = .clear
+        cell.tintColor = .systemPurple
+        cell.contentView.tintColor = .systemPurple
         
         return cell
     }
@@ -117,12 +152,27 @@ extension WeatherViewController {
 
 extension WeatherViewController {
     
-    private func updateUI() {
-        DispatchQueue.main.async { [weak self] in
-            self?.weatherTableView.reloadData()
-            self?.searchTextField.text = ""
-            self?.isLoading(false)
-        }
+    private func setupUI() {
+        view.addSubviews(weatherTableView, stackView)
+        view.backgroundColor = .systemBackground
+        title = "Open Weather"
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
+    
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            geoButton.widthAnchor.constraint(equalToConstant: 40),
+            geoButton.heightAnchor.constraint(equalToConstant: 40),
+            
+            stackView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 15),
+            stackView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -15),
+            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 5),
+            stackView.bottomAnchor.constraint(equalTo: weatherTableView.topAnchor, constant: -5),
+            
+            weatherTableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            weatherTableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            weatherTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        ])
     }
     
     private func setupBackgroundImage() {
@@ -131,9 +181,25 @@ extension WeatherViewController {
         imageView.contentMode = .scaleAspectFill
         imageView.alpha = 0.65
         view.insertSubview(imageView, at: 0)
-        searchTextField.backgroundColor = .clear
-        weatherTableView.backgroundColor = .clear
-        weatherTableView.allowsSelection = false
+    }
+    
+    private func updateUI() {
+        DispatchQueue.main.async { [weak self] in
+            self?.weatherTableView.reloadData()
+            self?.searchTextField.text = ""
+            self?.isLoading(false)
+        }
+    }
+    
+    private func isLoading(_ bool: Bool) {
+        var config = geoButton.configuration
+        config?.showsActivityIndicator = bool
+        geoButton.configuration = config
+    }
+    
+    @objc private func geoButtonPressed() {
+        isLoading(true)
+        locationManager.requestLocation()
     }
     
     private func dismissKeyboardOnTap() {
@@ -143,11 +209,6 @@ extension WeatherViewController {
         view.addGestureRecognizer(tapGesture)
     }
     
-    private func isLoading(_ bool: Bool) {
-        var config = geoButton.configuration
-        config?.showsActivityIndicator = bool
-        geoButton.configuration = config
-    }
     
     @objc private func hideKeyboard() {
         view.endEditing(true)
