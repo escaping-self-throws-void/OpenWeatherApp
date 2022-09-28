@@ -64,18 +64,18 @@ extension WeatherViewModel {
         switcher = true
     }
     
-    func getCitiesForecast(_ city: String?, failure: @escaping (String) -> Void) {
-        guard let cities = city else { return }
-        let filteredCities = filterCities(cities)
+    func getCitiesForecast(_ input: String?, failure: @escaping (String) -> Void) {
+        guard let input = input else { return }
+        let cities = input.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
         
-        guard isValid(filteredCities.count) else {
+        guard (3...7).contains(cities.count) else {
             failure("Please enter minimum 3 and max 7 cities")
             return
         }
         
         Task {
             do {
-                let list = try await fetchWeather(for: filteredCities)
+                let list = try await fetchWeather(for: cities)
                 weatherList = list
             } catch {
                 print(error)
@@ -98,11 +98,11 @@ extension WeatherViewModel {
     }
     
     func getLabelText(_ list: List) -> String? {
-        switcher ? createDateTime(unix: list.dt) : list.name
+        switcher ? list.dt.toDateString : list.name
     }
     
     func getHeaderText() -> String? {
-        switcher ? city?.name : createDateTime(unix: weatherList.first?.dt)
+        switcher ? city?.name : weatherList.first?.dt.toDateString
     }
     
     func getDescription(_ list: List) -> String {
@@ -137,33 +137,5 @@ extension WeatherViewModel {
         default:
             return "cloud.sun"
         }
-    }
-}
-
-// MARK: - Supporting methods
-
-extension WeatherViewModel {
-    private func createDateTime(unix: Double?) -> String {
-        var strDate = "undefined"
-        guard let unix = unix else { return strDate }
-        
-        let date = Date(timeIntervalSince1970: unix)
-        let dateFormatter = DateFormatter()
-        let timezone = TimeZone.current.abbreviation() ?? "CET"
-        
-        dateFormatter.timeZone = TimeZone(abbreviation: timezone)
-        dateFormatter.locale = NSLocale.current
-        dateFormatter.dateFormat = "MMM d, h:mm a"
-        strDate = dateFormatter.string(from: date)
-        
-        return strDate
-    }
-    
-    private func isValid(_ num: Int) -> Bool {
-        (3...7).contains(num) ? true : false
-    }
-    
-    private func filterCities(_ cities: String) -> [String] {
-        cities.filter { $0 == "," || $0.isLetter }.components(separatedBy: ",")
     }
 }

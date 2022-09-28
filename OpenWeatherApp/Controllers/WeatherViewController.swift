@@ -210,7 +210,6 @@ extension WeatherViewController {
         view.addGestureRecognizer(tapGesture)
     }
     
-    
     @objc private func hideKeyboard() {
         view.endEditing(true)
     }
