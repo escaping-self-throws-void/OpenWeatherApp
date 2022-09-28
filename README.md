@@ -40,15 +40,18 @@ Small app to fetch the weather forecast of multiple cities.
 ### Design Pattern
 
 * MVVM 
+* CleanSwift (other branch)
 
 ### Concepts
 
 * SOLID
-* Object-oriented programming
+* OOP
+* POP
+* Dependency injection
 
 ### Dependencies
 
-* RxSwift (on test branch)
+* RxSwift (other branch)
 
 ## In-depth 
 
