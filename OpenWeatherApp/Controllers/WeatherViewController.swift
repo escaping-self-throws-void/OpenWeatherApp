@@ -32,8 +32,9 @@ final class WeatherViewController: UIViewController {
     }()
     
     private lazy var geoButton: UIButton = {
-        let button = UIButton()
+        let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "location"), for: .normal)
+        
         button.tintColor = .systemPurple
         button.addTarget(self, action: #selector(geoButtonPressed), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
