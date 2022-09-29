@@ -10,9 +10,7 @@ import CoreLocation
 
 protocol WeatherViewModelProtocol: WeatherFetchService {
     init(callback: @escaping () -> Void)
-    
-    func numberOfRows() -> Int
-    func getListForRow(at indexPath: IndexPath) -> List
+    var weatherList: [List] { get set }
     
     func getLabelText(_ list: List) -> String?
     func getDescription(_ list: List) -> String
@@ -28,13 +26,13 @@ final class WeatherViewModel: WeatherViewModelProtocol {
         self.callback = callback
     }
     
-    private var callback: (() -> Void)
-    
-    private var weatherList: [List] = [] {
+    var weatherList: [List] = [] {
         didSet {
             callback()
         }
     }
+    
+    private var callback: (() -> Void)
     private var city: City?
     private var switcher = true
 }
@@ -89,14 +87,7 @@ extension WeatherViewModel {
 // MARK: - TableView methods
 
 extension WeatherViewModel {
-    func numberOfRows() -> Int {
-        weatherList.count
-    }
-    
-    func getListForRow(at indexPath: IndexPath) -> List {
-        weatherList[indexPath.row]
-    }
-    
+
     func getLabelText(_ list: List) -> String? {
         switcher ? list.dt.toDateString : list.name
     }

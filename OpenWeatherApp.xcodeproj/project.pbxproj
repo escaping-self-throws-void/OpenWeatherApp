@@ -146,7 +146,7 @@
 				CFA3EA2F28E45DB500E29AB4 /* Extensions */,
 				CFFCD70F285B1A6200F4B73F /* SupportingFiles */,
 				CFFCD70C285B12B300F4B73F /* Resources */,
-				CFFCD70B285B12A900F4B73F /* Controllers */,
+				CFFCD70B285B12A900F4B73F /* Views */,
 				CFDF66BB285CAFC6001B9A22 /* ViewModels */,
 				CFFCD713285B2A5000F4B73F /* Services */,
 				CFDF66B8285BA326001B9A22 /* Models */,
@@ -165,12 +165,12 @@
 			path = OpenWeatherAppTests;
 			sourceTree = "<group>";
 		};
-		CFFCD70B285B12A900F4B73F /* Controllers */ = {
+		CFFCD70B285B12A900F4B73F /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				CFFCD6DF285B126100F4B73F /* WeatherViewController.swift */,
 			);
-			path = Controllers;
+			path = Views;
 			sourceTree = "<group>";
 		};
 		CFFCD70C285B12B300F4B73F /* Resources */ = {

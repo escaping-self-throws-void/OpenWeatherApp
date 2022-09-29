@@ -14,7 +14,6 @@ final class WeatherViewController: UIViewController {
         let tableView = UITableView()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.delegate = self
-        tableView.dataSource = self
         tableView.backgroundColor = .clear
         tableView.allowsSelection = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -34,7 +33,6 @@ final class WeatherViewController: UIViewController {
     private lazy var geoButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "location"), for: .normal)
-        
         button.tintColor = .systemPurple
         button.addTarget(self, action: #selector(geoButtonPressed), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -53,6 +51,7 @@ final class WeatherViewController: UIViewController {
     
     private let locationManager = CLLocationManager()
     private var weatherViewModel: WeatherViewModelProtocol!
+    private var dataSource: ListDataSource!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,32 +62,51 @@ final class WeatherViewController: UIViewController {
         locationManager.requestWhenInUseAuthorization()
         weatherViewModel = WeatherViewModel(callback: updateUI)
         dismissKeyboardOnTap()
+        configureDataSource()
     }
 }
 
-// MARK: - UITableView methods
+// MARK: - Diffable Data Source Setup
 
-extension WeatherViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        weatherViewModel.numberOfRows()
+extension WeatherViewController {
+    fileprivate typealias ListDataSource = UITableViewDiffableDataSource<Section, List>
+    fileprivate typealias ListSnapshot = UITableViewDiffableDataSource<Section, List>
+    
+    fileprivate enum Section {
+        case main
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        let list = weatherViewModel.getListForRow(at: indexPath)
-        
-        var content = cell.defaultContentConfiguration()
-        content.text = weatherViewModel.getLabelText(list)
-        content.secondaryText = weatherViewModel.getDescription(list)
-        content.secondaryTextProperties.font = .systemFont(ofSize: 12, weight: .medium)
-        content.image = UIImage(systemName: weatherViewModel.getImage(list))
-        cell.contentConfiguration = content
-        cell.backgroundColor = .clear
-        cell.tintColor = .systemPurple
-        cell.contentView.tintColor = .systemPurple
-        
-        return cell
+    private func configureDataSource() {
+        dataSource = ListSnapshot(tableView: weatherTableView) { [weak self] tableView, indexPath, list in
+            let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+            guard let self = self else { return cell }
+            
+            var content = cell.defaultContentConfiguration()
+            content.text = self.weatherViewModel.getLabelText(list)
+            content.secondaryText = self.weatherViewModel.getDescription(list)
+            content.secondaryTextProperties.font = .systemFont(ofSize: 12, weight: .medium)
+            content.image = UIImage(systemName: self.weatherViewModel.getImage(list))
+            cell.contentConfiguration = content
+            cell.backgroundColor = .clear
+            cell.tintColor = .systemPurple
+            cell.contentView.tintColor = .systemPurple
+            
+            return cell
+        }
     }
+    
+    private func createSnapshot(from lists: [List]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section,List>()
+        snapshot.appendSections([.main])
+        snapshot.reloadSections([.main])
+        snapshot.appendItems(lists)
+        dataSource.apply(snapshot, animatingDifferences: false)
+    }
+}
+
+// MARK: - UITableView Header setup
+
+extension WeatherViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UITableViewHeaderFooterView()
@@ -185,8 +203,8 @@ extension WeatherViewController {
     }
     
     private func updateUI() {
+        createSnapshot(from: weatherViewModel.weatherList)
         DispatchQueue.main.async { [weak self] in
-            self?.weatherTableView.reloadData()
             self?.searchTextField.text = ""
             self?.isLoading(false)
         }
